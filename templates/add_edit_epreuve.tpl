@@ -1,18 +1,17 @@
+<h3>Ajout/ modification d'une épreuve</h3>
 <div class="pageoverflow">
 {$formstart}
 {$record_id}
 {$edition}
 
 
-
-
 <div class="pageoverflow">
-  <p class="pagetext">Journée</p>
-  <p class="pageinput">{$journee}</p>
+  <p class="pagetext">Libellé</p>
+  <p class="pageinput">{$libelle}</p>
 </div>
 <div class="pageoverflow">
-  <p class="pagetext">Epreuve</p>
-  <p class="pageinput">{$idepreuve}</p>
+  <p class="pagetext">Description</p>
+  <p class="pageinput">{$description}</p>
 </div>
 <div class="pageoverflow">
   <p class="pagetext">Actif</p>

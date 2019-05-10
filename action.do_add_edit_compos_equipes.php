@@ -8,6 +8,7 @@ if (!$this->CheckPermission('Compositions use'))
 	$this->RedirectToAdminTab('compos');
 }
 debug_display($params, 'parameters');
+$eq_comp = new equipes_comp;
 if(isset($params['cancel']) && $params['cancel'] == 'Annuler')
 {
 	$this->Redirect($id, 'defaultadmin', $returnid);
@@ -24,6 +25,8 @@ else
 if (isset($params['ref_equipe']) && $params['ref_equipe'] != '')
 {
 	$ref_equipe = $params['ref_equipe'];
+	$details = $eq_comp->details_equipe($ref_equipe);
+	$nb_joueurs_mini = $details['nb_joueurs'];
 }
 else
 {
@@ -32,6 +35,7 @@ else
 		
 if($error ==0)
 {
+	$message = '';
 	//on vire toutes les données de cette compo avant 
 	$query = "DELETE FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ? AND ref_equipe = ?";
 	$dbquery = $db->Execute($query, array($ref_action, $ref_equipe));
@@ -40,19 +44,26 @@ if($error ==0)
 	
 	if($dbquery)
 	{
-		$licence = '';
-		if (isset($params['licence']) && $params['licence'] != '')
+		$genid = '';
+		if (isset($params['genid']) && $params['genid'] != '')
 		{
-			$licence = $params['licence'];
+			$genid = $params['genid'];
 			$error++;
 		}
-		foreach($licence as $key=>$value)
+		$i = 0;
+		foreach($genid as $key=>$value)
 		{
-			$query2 = "INSERT INTO ".cms_db_prefix()."module_compositions_compos_equipes (ref_action, ref_equipe, licence) VALUES (?, ?, ?)";
+			$query2 = "INSERT INTO ".cms_db_prefix()."module_compositions_compos_equipes (ref_action, ref_equipe, genid) VALUES (?, ?, ?)";
 		//	echo $query2;
 			$dbresultat = $db->Execute($query2, array($ref_action, $ref_equipe,$key));
+			$i++;
 		}
-	$this->SetMessage('participants ajoutés !');
+		if($i < $nb_joueurs_mini)
+		{
+			$message.= "Attention équipe incomplete !";
+		}
+		$message.= 'participants ajoutés !';
+	$this->SetMessage($message);
 	}
 	else
 	{

@@ -5,14 +5,15 @@ if (!$this->CheckPermission('Compositions use'))
 	echo $this->ShowErrors($this->Lang('needpermission'));
 	return;
 }
-debug_display($params, 'Parameters');
+//debug_display($params, 'Parameters');
 $db =& $this->GetDb();
 global $themeObject;
-$ping_ops = new ping_admin_ops();
-$liste_epreuves_equipes = $ping_ops->liste_epreuves_equipes();
+$ping = cms_utils::get_module('Ping');
+//$ping_ops = new ping_admin_ops;
+$liste_epreuves_equipes = $ping->liste_epreuves_equipes();
 
 
-$ping = new Ping();
+//$ping = new Ping;
 $saison_courante = $ping->GetPreference('saison_en_cours');
 $phase_courante = $ping->GetPreference('phase_en_cours');
 $saison_en_cours = (isset($params['saison_en_cours']))?$params['saison_en_cours']:$saison_courante;
@@ -49,7 +50,7 @@ $smarty->assign('submitfilter',
 $smarty->assign('formend',$this->CreateFormEnd());
 
 $parms = array();
-$query = "SELECT id, idepreuve, licence, J1, J2, J3, J4, J5, J6, J7, phase, saison FROM ".cms_db_prefix()."module_compositions_brulage  WHERE saison = ? AND phase = ? AND idepreuve = ? ORDER BY id ASC";
+$query = "SELECT id, idepreuve, licence, J1, J2, J3, J4, J5, J6, J7,J8, J9, J10, J11, J12, J13, J14, phase, saison FROM ".cms_db_prefix()."module_compositions_brulage  WHERE saison = ? AND phase = ? AND idepreuve = ? ORDER BY id ASC";
 //$query.=" ORDER BY idepreuve ASC,numero_equipe ASC";
 $parms['saison'] = $saison_en_cours;
 $parms['phase'] = $phase;
@@ -73,12 +74,19 @@ $dbresult= $db->Execute($query,$parms);
 				$onerow->idepreuve = $row['idepreuve'];
 				$onerow->licence=  $ping->get_name($row['licence']);
 				$onerow->J1= $comp_ops->get_equipe_official_number($row['J1']);
-				$onerow->J2= $row['J2'];
-				$onerow->J3= $row['J3'];
-				$onerow->J4= $row['J4'];
-				$onerow->J5= $row['J5'];
-				$onerow->J6= $row['J6'];
-				$onerow->J7= $row['J7'];
+				$onerow->J2= $comp_ops->get_equipe_official_number($row['J2']);
+				$onerow->J3= $comp_ops->get_equipe_official_number($row['J3']);
+				$onerow->J4= $comp_ops->get_equipe_official_number($row['J4']);
+				$onerow->J5= $comp_ops->get_equipe_official_number($row['J5']);
+				$onerow->J6= $comp_ops->get_equipe_official_number($row['J6']);
+				$onerow->J7= $comp_ops->get_equipe_official_number($row['J7']);
+				$onerow->J8= $comp_ops->get_equipe_official_number($row['J8']);
+				$onerow->J9= $comp_ops->get_equipe_official_number($row['J9']);
+				$onerow->J10= $comp_ops->get_equipe_official_number($row['J10']);
+				$onerow->J11= $comp_ops->get_equipe_official_number($row['J11']);
+				$onerow->J12= $comp_ops->get_equipe_official_number($row['J12']);
+				$onerow->J13= $comp_ops->get_equipe_official_number($row['J13']);
+				$onerow->J14= $comp_ops->get_equipe_official_number($row['J14']);
 				$onerow->phase= $row['phase'];
 				$onerow->saison= $row['saison'];
 				

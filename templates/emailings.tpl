@@ -1,10 +1,10 @@
 {$start_form}
 <div class="pageoverflow">
-	<p class="pagetext">Email du trésorier</p>
+	<p class="pagetext">Email du gestionnaire des compos</p>
 	<p class="pageinput">{$admin_email}</p>
 </div>
 <fieldset>
-<legend>Relance des impayés</legend>
+<legend>Envoi des convocations</legend>
 <div class="pageoverflow">
 	<p class="pagetext">Le sujet du mail</p>
 	<p class="pageinput">{$sujet_relance_email}</p>

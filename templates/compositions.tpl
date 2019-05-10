@@ -8,13 +8,13 @@
 		<!--<th>Date</th>-->
 		<th>Id</th>
 		<th>Championnat</th>
-		<th>Nb Equipes</th>
 		<th>Journée</th>
-		<th>Phase</th>
+		<th>Nb Equipes</th>
+		<th>Nb joueurs mini</th>
 		<th>Fait</th>
 		<th>Brouillon/Propre ?</th>
 		<th>Verrou</th>
-		<th colspan="4">Action(s)</th>
+		<th colspan="3">Action(s)</th>
 	</tr>
  </thead>
  <tbody>
@@ -22,14 +22,13 @@
   <tr class="{$entry->rowclass}">
 	<!--<td>{$entry->date_created}</td>-->
 	<td> {$entry->id}</td>
-	<td>{$entry->championnat}({$entry->idepreuve})</td>
-	<td>{$entry->equipes_concernees}</td>
+	<td>{$entry->championnat}</td>
 	<td>{$entry->journee}</td>
-	<td>{$entry->phase}</td>
+	<td>{$entry->equipes_concernees}</td>
+	<td>{$entry->nb_players}</td>
 	<td>{$entry->pourcentage_remplissage}%</td>
 	<td>{$entry->actif}</td>
 	<td>{$entry->statut}</td>
-	<td>{$entry->manage}</td>
 	<td>{$entry->view}</td>
 	<td>{$entry->duplicate}</td>
 	<td>{$entry->delete}</td>

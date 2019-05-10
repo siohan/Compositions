@@ -9,10 +9,10 @@ if (!$this->CheckPermission('Compositions use'))
 global $themeObject;
 //debug_display($params, 'Parameters');
 //$ping = cms_utils::get_module('Ping');
-$ping_ops = new ping_admin_ops();
-$liste_epreuves_equipes = $ping_ops->liste_epreuves_equipes();
+$ping_ops = new compositionsbis;
+$liste_epreuves_equipes = $ping_ops->liste_epreuves();
 //var_dump($liste_epreuves_equipes);
-for($i=0; $i<=10;$i++)
+for($i=1; $i<=50;$i++)
 {
 //	echo $i;
 	$liste_journees[$i] = $i;
@@ -25,7 +25,7 @@ if(isset($params['record_id']) && $params['record_id'] !="")
 {
 		$record_id = $params['record_id'];
 		$edit = 1;
-		$query = "SELECT id, idepreuve, journee, ref_action, actif, statut, phase, saison FROM ".cms_db_prefix()."module_compositions_journees WHERE ref_action = ?";
+		$query = "SELECT id, idepreuve, journee, ref_action, actif, statut FROM ".cms_db_prefix()."module_compositions_journees WHERE ref_action = ?";
 		$dbresult = $db->Execute($query, array($record_id));
 		$compt = 0;
 		while ($dbresult && $row = $dbresult->FetchRow())
@@ -34,9 +34,7 @@ if(isset($params['record_id']) && $params['record_id'] !="")
 			$id = $row['id'];
 			$ref_action = $row['ref_action'];
 			$idepreuve = $row['idepreuve'];
-			$journee = $row['journee'];
-			$phase = $row['phase'];
-			$saison = $row['saison'];
+			$journee = $row['journee'];			
 			$actif = $row['actif'];
 			$statut = $row['statut'];
 		}
@@ -70,8 +68,6 @@ else
 			$this->CreateInputDropdown($id,'idepreuve',$liste_epreuves_equipes,$selectedIndex=$key2_idepreuve,$selectedvalue=$idepreuve));
 	$smarty->assign('journee',
 			$this->CreateInputDropdown($id,'journee',(isset($journee)?$journees:$liste_journees)));
-	$smarty->assign('phase',
-			$this->CreateInputDropdown($id, 'phase',(isset($phase)?$phase:$liste_phase)));
 	$smarty->assign('actif',
 			$this->CreateInputDropdown($id,'actif',(isset($actif)?$actif:$OuiNon),50,200));						
 	$smarty->assign('submit',

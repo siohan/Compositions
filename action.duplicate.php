@@ -7,13 +7,13 @@ if (!$this->CheckPermission('Compositions use'))
 	return;
 }
 global $themeObject;
-debug_display($params, 'Parameters');
+//debug_display($params, 'Parameters');
 //$ping = cms_utils::get_module('Ping');
 $db = cmsms()->GetDb();
 if(isset($params['ref_action']) && $params['ref_action'] !="")
 {
 	$ref_action = $params['ref_action'];
-	$query = "SELECT idepreuve, journee, ref_action, actif, statut, phase, saison FROM ".cms_db_prefix()."module_compositions_journees WHERE ref_action = ?";
+	$query = "SELECT idepreuve, journee, ref_action, actif, statut FROM ".cms_db_prefix()."module_compositions_journees WHERE ref_action = ?";
 	$dbresult = $db->Execute($query, array($ref_action));
 	
 	if($dbresult && $dbresult->RecordCount()>0)
@@ -23,25 +23,24 @@ if(isset($params['ref_action']) && $params['ref_action'] !="")
 			$idepreuve = $row['idepreuve'];
 			$journee = $row['journee'];
 			$journee = $journee+1;
-			$phase = $row['phase'];
-			$saison = $row['saison'];
+
 			//on créé une nouvelle ref_action
 			$neo_ref_action = $this->random_string(10);
 			$comp_ops = new compositionsbis;
 			//on peut dumpliquer la première compo générale
-			$dup = $comp_ops->duplicate_journee($neo_ref_action, $phase, $journee, $idepreuve, $saison);
+			$dup = $comp_ops->duplicate_journee($neo_ref_action, $journee, $idepreuve);
 			
 			if (TRUE === $dup)
 			{
-				$query = "SELECT ref_action, ref_equipe, licence, statut FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ?";
+				$query = "SELECT ref_action, ref_equipe, genid, statut FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ?";
 				$dbresult = $db->Execute($query, array($ref_action));
 				if($dbresult && $dbresult->RecordCount()>0)
 				{
 					while($row = $dbresult->FetchRow())
 					{
 						$ref_equipe = $row['ref_equipe'];
-						$licence = $row['licence'];
-						$dup2 = $comp_ops->duplicate($neo_ref_action, $ref_action,$ref_equipe,$licence);
+						$genid = $row['genid'];
+						$dup2 = $comp_ops->duplicate($neo_ref_action, $ref_action,$ref_equipe,$genid);
 					}
 				}
 			}

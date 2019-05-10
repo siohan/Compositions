@@ -6,7 +6,7 @@ if (!$this->CheckPermission('Compositions use'))
 	echo $this->ShowErrors($this->Lang('needpermission'));
 	return;   
 }
-debug_display($params, 'Parameters');
+//debug_display($params, 'Parameters');
 $db =& $this->GetDb();
 if(isset($params['idepreuve']) && $params['idepreuve'] != '')
 {
@@ -26,13 +26,26 @@ $dbresult = $db->Execute($query);
 if($dbresult && $dbresult->RecordCount()>0)
 {
 	//On prépare le formulaire	
-
+	//instanciation du module Ping
+//	$ping = cms_utils::get_module('Ping');
+	$ping = new ping_admin_ops;
+	$annee_courante = date('Y');
+	$mois_courant = date('m');
 	while($row = $dbresult->FetchRow())
 	{
 		//var_dump($row);
 
 		$licence = $row['licence'];
-		$joueur = $row['joueur'].'   ('.$row['points'].' pts/ '.$row['sexe'].' / '.$row['cat'].')';
+		if($mois_courant>=7)
+		{
+			$pts = $ping->get_sit_mens($licence, $mois_event=7, $annee_courante);
+		}
+		else
+		{
+			$pts = $ping->get_sit_mens($licence, $mois_event=1, $annee_courante);
+		}
+		//on va chercher les points officiels de ce joueur dans le module Ping
+		$joueur = $row['joueur'].'   ('.$pts.' pts/ '.$row['sexe'].' / '.$row['cat'].')';
 		$rowarray[$licence]['name'] = $joueur;
 		$rowarray[$licence]['participe'] = false;
 
@@ -62,6 +75,8 @@ if($dbresult && $dbresult->RecordCount()>0)
 	
 	$smarty->assign('submit',
 			$this->CreateInputSubmit($id, 'submit', $this->Lang('submit'), 'class="button"'));
+	$smarty->assign('submitall',
+			$this->CreateInputSubmit($id, 'submitall', $this->Lang('submitall'), 'class="button"'));
 	$smarty->assign('cancel',
 			$this->CreateInputSubmit($id,'cancel',
 						$this->Lang('cancel')));
@@ -71,6 +86,9 @@ if($dbresult && $dbresult->RecordCount()>0)
 
 	$smarty->assign('formend',
 			$this->CreateFormEnd());
+						
+			
+	
 echo $this->ProcessTemplate('listes_joueurs.tpl');
 }
 else

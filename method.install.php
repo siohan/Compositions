@@ -1,6 +1,6 @@
 <?php
 #-------------------------------------------------------------------------
-# Module: Paiements
+# Module: Compositions
 # Version: 0.1, Claude SIOHAN Agi webconseil
 # Method: Install
 #-------------------------------------------------------------------------
@@ -37,9 +37,7 @@ $flds = "
 	journee I(2),
 	date_created D,
 	actif I(1) DEFAULT 0,
-	statut I(1) DEFAULT 0,
-	phase I(1),
-	saison C(10)";
+	statut I(1) DEFAULT 0";
 	$sqlarray = $dict->CreateTableSQL( cms_db_prefix()."module_compositions_journees", $flds, $taboptarray);
 	$dict->ExecuteSQLArray($sqlarray);			
 //
@@ -51,13 +49,19 @@ $flds = "
 	libequipe C(100),
 	friendlyname C(15),
 	idepreuve I(4),
+	liste_id I(3),
 	capitaine I(10),
-	nb_joueurs I(1) DEFAULT 4,
-	clt_mini I(4) DEFAULT 0,
-	points_maxi I(4) DEFAULT 0,
-	phase I(1),
-	saison C(10)";
+	nb_joueurs I(1) DEFAULT 0";
 	$sqlarray = $dict->CreateTableSQL( cms_db_prefix()."module_compositions_equipes", $flds, $taboptarray);
+	$dict->ExecuteSQLArray($sqlarray);			
+//
+// table schema description
+$flds = "
+	id I(11) AUTO KEY,
+	libelle C(255),
+	description C(255),
+	actif I(1) DEFAULT '1'";
+	$sqlarray = $dict->CreateTableSQL( cms_db_prefix()."module_compositions_epreuves", $flds, $taboptarray);
 	$dict->ExecuteSQLArray($sqlarray);			
 //
 // table schema description
@@ -65,54 +69,32 @@ $flds = "
 	id I(11) AUTO KEY,
 	ref_action C(10),
 	ref_equipe C(15),
-	licence I(10),
+	genid I(10),
 	statut I(1) DEFAULT 0 ";
 	$sqlarray = $dict->CreateTableSQL( cms_db_prefix()."module_compositions_compos_equipes", $flds, $taboptarray);
 	$dict->ExecuteSQLArray($sqlarray);			
-//
-// table schema description
-$flds = "
-	id I(11) AUTO KEY,
-	idepreuve I(4),
-	licence I(10)";
-	$sqlarray = $dict->CreateTableSQL( cms_db_prefix()."module_compositions_listes_joueurs", $flds, $taboptarray);
-	$dict->ExecuteSQLArray($sqlarray);			
-//
-// table schema description
-$flds = "
-	id I(11) AUTO KEY,
-	idepreuve I(4),
-	licence I(11),
-	phase I(1),
-	saison C(10)";
-	$sqlarray = $dict->CreateTableSQL( cms_db_prefix()."module_compositions_brulage", $flds, $taboptarray);
-	$dict->ExecuteSQLArray($sqlarray);			
-//
+//			
+
 //
 #Indexes
 //on créé un index sur la table
 $idxoptarray = array('UNIQUE');
 $sqlarray = $dict->CreateIndexSQL(cms_db_prefix().'epreuves_journees',
-	    			cms_db_prefix().'module_compositions_journees', 'idepreuve, journee, phase',$idxoptarray);
+	    			cms_db_prefix().'module_compositions_journees', 'idepreuve, journee',$idxoptarray);
 $dict->ExecuteSQLArray($sqlarray);
 #
 //on créé un index sur la table
 $idxoptarray = array('UNIQUE');
 $sqlarray = $dict->CreateIndexSQL(cms_db_prefix().'equipes',
-	    			cms_db_prefix().'module_compositions_equipes', 'idepreuve, ref_equipe, saison',$idxoptarray);
+	    			cms_db_prefix().'module_compositions_equipes', 'idepreuve, ref_equipe',$idxoptarray);
 $dict->ExecuteSQLArray($sqlarray);
 #
 //on créé un index sur la table
 $idxoptarray = array('UNIQUE');
-$sqlarray = $dict->CreateIndexSQL(cms_db_prefix().'brulage',
-		    		cms_db_prefix().'module_compositions_brulage', 'idepreuve, licence, phase,saison',$idxoptarray);
-$dict->ExecuteSQLArray($sqlarray);
-//on créé un index sur la table
-$idxoptarray = array('UNIQUE');
 $sqlarray = $dict->CreateIndexSQL(cms_db_prefix().'compos_equipes',
-		    		cms_db_prefix().'module_compositions_compos_equipes', 'ref_action, ref_equipe, licence',$idxoptarray);
+		    		cms_db_prefix().'module_compositions_compos_equipes', 'ref_action, ref_equipe, genid',$idxoptarray);
 $dict->ExecuteSQLArray($sqlarray);
-	#
+			#
 //Permissions
 $this->CreatePermission('Compositions use', 'Compositions : utiliser le module');
 $this->CreatePermission('Compositions lock', 'Compositions : Verrouiller');
@@ -128,7 +110,7 @@ if( file_exists( $fn ) )
 # Les préférences 
 
 $this->SetPreference('admin_email', 'root@localhost.com');
-$this->SetPreference('sujet_relance_email','[T2T] Ton équipe...');
+$this->SetPreference('sujet_relance_email','[A.S] Ton équipe...');
 
 
 // put mention into the admin log

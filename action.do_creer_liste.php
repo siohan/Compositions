@@ -6,7 +6,7 @@ if (!$this->CheckPermission('Compositions use'))
 	$this->SetMessage($this->Lang('needpermission'));
 	$this->RedirectToAdminTab('compos');
 }
-debug_display($params, 'parameters');
+//debug_display($params, 'parameters');
 if(isset($params['cancel']) && $params['cancel'] == 'Annuler')
 {
 	$this->Redirect($id, 'defaultadmin', $returnid);
@@ -24,8 +24,8 @@ else
 		
 if($error ==0)
 {
-	//on vire toutes les données de cette compo avant 
-	$query = "DELETE FROM ".cms_db_prefix()."module_compositions_listes_joueurs WHERE idepreuve = ?";
+	 
+        $query = "DELETE FROM ".cms_db_prefix()."module_compositions_listes_joueurs WHERE idepreuve = ?";
 	$dbquery = $db->Execute($query, array($idepreuve));
 	
 	//la requete a fonctionné ?
@@ -45,19 +45,7 @@ if($error ==0)
 			$query2 = "INSERT INTO ".cms_db_prefix()."module_compositions_listes_joueurs (idepreuve, licence) VALUES (?, ?)";
 		//	echo $query2;
 			$dbresultat = $db->Execute($query2, array($idepreuve,$key));
-			/*
-			//on insère aussi ds la tbl brulage ?
-			if($dbresultat)
-			{
-				//on vérifie si le joueur est déjà présent ou non
-				$present = $brul_ops->is_already_there($idepreuve,$key);
-				//var_dump($present);
-				if(FALSE === $present)
-				{
-					$add_player = $brul_ops->add_player($idepreuve, $key);
-				}
-			}
-			*/
+			
 		}
 	$this->SetMessage('participants ajoutés !');
 	}

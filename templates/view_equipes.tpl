@@ -1,5 +1,6 @@
 {$retour}
 {if $itemcount > 0}
+<h3>{$epreuve}</h3>
 <p class="warning">{$message}</p>
 <table cellpadding="0" class="pagetable cms_sortable tablesorter" id="articlelist">
  <thead>
@@ -8,7 +9,7 @@
 
   <tr>
 	{foreach from=$items item=entry}
-	<td> {$entry->equipe}</td>
+	<td {if $entry->class == 1}style="background-color:green"{/if}> {$entry->equipe}</td>
 	{/foreach}	
   </tr>
 

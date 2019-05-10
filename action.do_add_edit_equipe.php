@@ -13,15 +13,8 @@ if(isset($params['cancel']))
 }
 
 $error = 0;
-debug_display($params, 'Parameters');
-if (isset($params['record_id']) && $params['record_id'] != '')
-{
-	$ref_equipe = $params['record_id'];
-}
-else
-{
-	$error++;
-}
+//debug_display($params, 'Parameters');
+
 if (isset($params['record_id']) && $params['record_id'] != '')
 {
 	$ref_equipe = $params['record_id'];
@@ -34,23 +27,36 @@ if (isset($params['friendlyname']) && $params['friendlyname'] != '')
 {
 	$friendlyname = $params['friendlyname'];
 }
+if (isset($params['capitaine']) && $params['capitaine'] != '')
+{
+	$capitaine = $params['capitaine'];
+}
 if (isset($params['nb_joueurs']) && $params['nb_joueurs'] != '')
 {
 	$nb_joueurs = $params['nb_joueurs'];
 }
-if (isset($params['clt_mini']) && $params['clt_mini'] != '')
+if (isset($params['idepreuve']) && $params['idepreuve'] != '')
 {
-	$clt_mini = $params['clt_mini'];
+	$idepreuve = $params['idepreuve'];
 }
-if (isset($params['points_maxi']) && $params['points_maxi'] != '')
+if (isset($params['liste_id']) && $params['liste_id'] != '')
 {
-	$points_maxi = $params['points_maxi'];
-}		
+	$liste_id = $params['liste_id'];
+}
+		
 if($error ==0)
 {
-	//on vire toutes les données de cette compo avant 
-	$query = "UPDATE  ".cms_db_prefix()."module_compositions_equipes SET libequipe = ?, friendlyname = ?, nb_joueurs = ?, clt_mini = ?, points_maxi = ?  WHERE ref_equipe = ?";
-	$dbquery = $db->Execute($query, array($libequipe, $friendlyname, $nb_joueurs, $clt_mini, $points_maxi, $ref_equipe));
+	if(isset($params['submitasnew']))
+	{
+		//on ajoute une nouvelle équipe
+		$teams_ops = new equipes_comp;
+		$add_team = $teams_ops->add_team($libequipe, $friendlyname, $idepreuve, $capitaine, $nb_joueurs, $liste_id);
+	}//on vire toutes les données de cette compo avant 
+	else
+	{
+		$query = "UPDATE  ".cms_db_prefix()."module_compositions_equipes SET libequipe = ?, friendlyname = ?, capitaine = ?, nb_joueurs = ?, idepreuve = ?, liste_id = ?  WHERE id = ?";
+		$dbquery = $db->Execute($query, array($libequipe, $friendlyname, $capitaine, $nb_joueurs, $idepreuve, $liste_id, $ref_equipe));
+	}
 	
 	//la requete a fonctionné ?
 	

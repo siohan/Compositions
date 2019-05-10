@@ -44,6 +44,9 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $sqlarray = $dict->DropTableSQL( cms_db_prefix()."module_compositions_compos_equipes" );
 $dict->ExecuteSQLArray($sqlarray);
+
+$sqlarray = $dict->DropTableSQL( cms_db_prefix()."module_compositions_epreuves" );
+$dict->ExecuteSQLArray($sqlarray);
 // remove the permissions
 $this->RemovePermission('Compositions use');
 $this->RemovePermission('Compositions lock');

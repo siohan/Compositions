@@ -11,6 +11,31 @@ class Compositionsbis
 
 ##
 ##
+	//récupère les détails d'une ref_action
+	function details_ref_action($ref_action)
+	{
+		$db = cmsms()->GetDb();
+		$query = "SELECT id,  FROM ".cms_db_prefix()."module_compositions_equipes WHERE id = ?"; 
+		$dbresult = $db->Execute($query, array($record_id));
+		if($dbresult)
+		{
+			$details = array();
+			while($row = $dbresult->FetchRow())
+			{
+				$details['id'] = $row['id'];
+				$details['libequipe'] = $row['libequipe'];
+				$details['friendlyname'] = $row['friendlyname'];
+				$details['idepreuve'] = $row['idepreuve'];
+				$details['nb_joueurs'] = $row['nb_joueurs'];
+				$details['liste_id'] = $row['liste_id'];
+			}
+			return $details;
+		}
+		else
+		{ 
+			return false;
+		}
+	}
 	//Cette fonction verrouille les toutes les compositions d'une journée
 	public function  lock($ref_action)
 	{
@@ -84,14 +109,12 @@ class Compositionsbis
 		}
 	}
 	//Cette fonction calcule le nb d'équipes pour une épreuve et une phase donnée
-	function nb_equipes_idepreuve($idepreuve,$phase)
+	function nb_equipes_idepreuve($idepreuve)
 	{
 		global $gCms;
 		$db = cmsms()->GetDb();
-		$ping = cms_utils::get_module('Ping');
-		$saison = $ping->GetPreference('saison_en_cours');
-		$query = "SELECT count(*) AS nb FROM ".cms_db_prefix()."module_compositions_equipes WHERE idepreuve = ? AND saison = ? AND phase = ?";
-		$dbresult = $db->Execute($query, array($idepreuve,$saison, $phase));
+		$query = "SELECT count(*) AS nb FROM ".cms_db_prefix()."module_compositions_equipes WHERE idepreuve = ?";
+		$dbresult = $db->Execute($query, array($idepreuve));
 		if($dbresult && $dbresult->RecordCount() >0)
 		{
 			//on retourne le nb d'équipes
@@ -114,13 +137,13 @@ class Compositionsbis
 	{
 		global $gCms;
 		$db = cmsms()->GetDb();
-		$query = "SELECT licence FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ? AND ref_equipe = ?";
+		$query = "SELECT genid FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ? AND ref_equipe = ?";
 		$dbresult = $db->Execute($query, array($ref_action, $ref_equipe));
 		if($dbresult && $dbresult->RecordCount()>0)
 		{
 			while($row = $dbresult->FetchRow())
 			{
-				$retour[] = $row['licence'];
+				$retour[] = $row['genid'];
 			}
 			return $retour;
 		}
@@ -130,19 +153,19 @@ class Compositionsbis
 		}
 		
 	}
-	// Cette fonction récupère  toutes les licences disponibles (non encore affectées à cette journée)
+	// Cette fonction récupère  tous les genid disponibles (non encore affectées à cette journée)
 	// et exclue celles déjà affectées pour cette équipe, pour une réédition d'une composition en fait
 	function licences_disponibles($ref_action,$ref_equipe)
 	{
 		global $gCms;
 		$db = cmsms()->GetDb();
-		$query = "SELECT licence FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ? AND ref_equipe != ?";
+		$query = "SELECT genid FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ? AND ref_equipe != ?";
 		$dbresult = $db->Execute($query, array($ref_action, $ref_equipe));
 		if($dbresult && $dbresult->RecordCount()>0)
 		{
 			while($row = $dbresult->FetchRow())
 			{
-				$retour[] = $row['licence'];
+				$retour[] = $row['genid'];
 			}
 			return $retour;
 		}
@@ -152,6 +175,7 @@ class Compositionsbis
 		}
 		
 	}
+	/*
 	function restrictions_clt_mini($ref_equipe)
 	{
 		global $gCms;
@@ -175,7 +199,7 @@ class Compositionsbis
 		}
 		
 	}
-	
+	*/
 	function get_idepreuve($ref_action)
 	{
 		global $gCms;
@@ -194,44 +218,7 @@ class Compositionsbis
 			return FALSE;
 		}
 	}
-	function get_phase($ref_action)
-	{
-		global $gCms;
-		$db = cmsms()->GetDb();
-		$query = "SELECT phase FROM ".cms_db_prefix()."module_compositions_journees WHERE ref_action = ?";
-		$dbresult = $db->Execute($query, array($ref_action));
-		if($dbresult && $dbresult->RecordCount()>0)
-		{
-			$row = $dbresult->FetchRow();
-			$phase = $row['phase'];
-			
-				return $phase;			
-			
-		}
-		else
-		{
-			return FALSE;
-		}
-	}
-	function get_saison($ref_action)
-	{
-		global $gCms;
-		$db = cmsms()->GetDb();
-		$query = "SELECT saison FROM ".cms_db_prefix()."module_compositions_journees WHERE ref_action = ?";
-		$dbresult = $db->Execute($query, array($ref_action));
-		if($dbresult && $dbresult->RecordCount()>0)
-		{
-			$row = $dbresult->FetchRow();
-			$saison = $row['saison'];
-			
-				return $saison;
-			
-		}
-		else
-		{
-			return FALSE;
-		}
-	}
+	
 	function get_journee($ref_action)
 	{
 		global $gCms;
@@ -255,7 +242,7 @@ class Compositionsbis
 	{
 		global $gCms;
 		$db = cmsms()->GetDb();
-		$query = "SELECT friendlyname, libequipe FROM ".cms_db_prefix()."module_compositions_equipes WHERE ref_equipe = ?";
+		$query = "SELECT friendlyname, libequipe FROM ".cms_db_prefix()."module_compositions_equipes WHERE id = ?";
 		$dbresult = $db->Execute($query, array($ref_equipe));
 		if($dbresult && $dbresult->RecordCount()>0)
 		{
@@ -292,14 +279,14 @@ class Compositionsbis
 	{
 		global $gCms;
 		$db = cmsms()->GetDb();
-		$query = "SELECT licence FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ?";
+		$query = "SELECT genid FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ?";
 		$dbresult = $db->Execute($query, array($ref_action));
 		
 		if($dbresult && $dbresult->RecordCount()>0)
 		{
 			while($row = $dbresult->FetchRow())
 			{
-				$retour[] = $row['licence'];
+				$retour[] = $row['genid'];
 			}
 			return $retour;
 		}
@@ -313,7 +300,7 @@ class Compositionsbis
 	{
 		global $gCms;
 		$db = cmsms()->GetDb();
-		$query = "SELECT count(licence) AS nb FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ?";
+		$query = "SELECT count(genid) AS nb FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ?";
 		$dbresult = $db->Execute($query, array($ref_action));
 		
 		if($dbresult && $dbresult->RecordCount()>0)
@@ -337,6 +324,14 @@ class Compositionsbis
 		$query = "DELETE FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ? AND ref_equipe = ?";
 		$dbresult = $db->Execute($query, array($ref_action, $ref_equipe));
 	}
+	//supprime un joueur d'une ref_actionla compo d'une équipe donnée
+	function delete_joueur($genid,$ref_action)
+	{
+		global $gCms;
+		$db = cmsms()->GetDb();
+		$query = "DELETE FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ? AND genid = ?";
+		$dbresult = $db->Execute($query, array($ref_action, $genid));
+	}
 	// Cette fonction supprime toutes les compos d'une ref_action
 	function delete_compo($ref_action)
 	{
@@ -345,13 +340,21 @@ class Compositionsbis
 		$query = "DELETE FROM ".cms_db_prefix()."module_compositions_compos_equipes WHERE ref_action = ?";
 		$dbresult = $db->Execute($query, array($ref_action));
 	}
-	//Cette fonction supprime la journée 
+	//Supprime la journée 
 	function delete_journee($ref_action)
 	{
 		global $gCms;
 		$db = cmsms()->GetDb();
 		$query = "DELETE FROM ".cms_db_prefix()."module_compositions_journees WHERE ref_action = ?";
 		$dbresult = $db->Execute($query, array($ref_action));
+	}
+	//Supprime une équipe purement et simplement 
+	function delete_eq($record_id)
+	{
+		global $gCms;
+		$db = cmsms()->GetDb();
+		$query = "DELETE FROM ".cms_db_prefix()."module_compositions_equipes WHERE id = ?";
+		$dbresult = $db->Execute($query, array($record_id));
 	}
 	// change le statut d'une ref_action en actif ou non
 	function actif($ref_action, $actif)
@@ -369,13 +372,14 @@ class Compositionsbis
 			$dbresult = $db->Execute($query, array($ref_action));
 		}
 	}
-	function duplicate_journee($neo_ref_action, $phase, $journee, $idepreuve, $saison)
+	//duplique une journée
+	function duplicate_journee($neo_ref_action, $journee, $idepreuve)
 	{
 		global $gCms;
 		$db = cmsms()->GetDb();
 		
-		$query = "INSERT INTO ".cms_db_prefix()."module_compositions_journees (ref_action,idepreuve,journee,phase, saison) VALUES(?,?,?,?, ?)";
-		$dbresult = $db->Execute($query, array($neo_ref_action,$idepreuve, $journee,$phase, $saison));
+		$query = "INSERT INTO ".cms_db_prefix()."module_compositions_journees (ref_action,idepreuve,journee) VALUES( ?,?,?)";
+		$dbresult = $db->Execute($query, array($neo_ref_action,$idepreuve, $journee));
 		if($dbresult)
 		{
 			return TRUE;
@@ -385,13 +389,32 @@ class Compositionsbis
 			return FALSE;
 		}
 	}
-	function duplicate($neo_ref_action,$ref_action, $ref_equipe, $licence)
+	//duplique une journée (journée + 1)
+	function duplicate($neo_ref_action,$ref_action, $ref_equipe, $genid)
 	{
 		global $gCms;
 		$db = cmsms()->GetDb();	
 		
-		$query = "INSERT INTO ".cms_db_prefix()."module_compositions_compos_equipes (ref_action, ref_equipe, licence) VALUES (?,?,?)";
-		$dbresult = $db->Execute($query, array($neo_ref_action, $ref_equipe, $licence));
+		$query = "INSERT INTO ".cms_db_prefix()."module_compositions_compos_equipes (ref_action, ref_equipe, genid) VALUES (?,?,?)";
+		$dbresult = $db->Execute($query, array($neo_ref_action, $ref_equipe, $genid));
+
+		if($dbresult)
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+	//duplique une équipe
+	function duplicate_team($record_id)
+	{
+		global $gCms;
+		$db = cmsms()->GetDb();	
+		
+		$query = "INSERT INTO ".cms_db_prefix()."module_compositions_compos_equipes (ref_action, ref_equipe, genid) VALUES (?,?,?)";
+		$dbresult = $db->Execute($query, array($neo_ref_action, $ref_equipe, $genid));
 
 		if($dbresult)
 		{
@@ -403,15 +426,12 @@ class Compositionsbis
 		}
 	}
 	//Cette fonction compte le nb de joueurs pour une épreuve
-	function player_by_idepreuve ($idepreuve,$phase)
+	function player_by_idepreuve ($idepreuve)
 	{
 		global $gCms;
 		$db = cmsms()->GetDb();
-		
-		$ping = cms_utils::get_module('Ping');
-		$saison = $ping->GetPreference('saison_en_cours');
-		$query = "SELECT SUM(nb_joueurs) AS nb FROM ".cms_db_prefix()."module_compositions_equipes WHERE idepreuve = ? AND saison = ? AND phase = ?";
-		$dbresult = $db->Execute($query, array($idepreuve,$saison, $phase));
+		$query = "SELECT SUM(nb_joueurs) AS nb FROM ".cms_db_prefix()."module_compositions_equipes WHERE idepreuve = ?";
+		$dbresult = $db->Execute($query, array($idepreuve));
 		if($dbresult && $dbresult->RecordCount() >0)
 		{
 			//on retourne le nb d'équipes
@@ -422,36 +442,188 @@ class Compositionsbis
 		else
 		{
 			//pas de résultats, on renvoit FALSE
-			return FALSE;
+			$nb = 0;
+			return $nb;
 		} 
 	}
+	//calcule le pourcentage de remplissage des compositions d'équipes
 	function pourcentage_remplissage($ref_action)
 	{
-		$phase = $this->get_phase($ref_action);
+		//$phase = $this->get_phase($ref_action);
 		$epreuve = $this->get_idepreuve($ref_action);
-		$total_players = $this->player_by_idepreuve($epreuve, $phase);
+		$total_players = $this->player_by_idepreuve($epreuve);
 		$already_used = $this->nb_already_used_licences($ref_action);
-		$pourcentage = round(($already_used*100)/$total_players, 2);
+		//$pourcentage = round(($already_used*100)/$total_players, 2);
+		if($total_players == 0)
+		{
+			$pourcentage = 0;
+		}
+		else
+		{
+			$pourcentage = round(($already_used*100)/$total_players, 2);
+		}
+		
 		return $pourcentage;
 	}
+	//vérifie si une liste de joueurs est déjà existante ou non pour une épreuve donnée
 	 function liste_exists($idepreuve)
 	{
 		global $gCms;
 		$db = cmsms()->GetDb();
 		$query = "SELECT SUM(idepreuve) AS nb FROM ".cms_db_prefix()."module_compositions_listes_joueurs WHERE idepreuve = ?";
-		$dbresult = $db->Execute($query, array($idepreuve,$saison, $phase));
-		if($dbresult && $dbresult->RecordCount() >0)
+		$dbresult = $db->Execute($query, array($idepreuve));
+		$row = $dbresult->FetchRow();
+		$nb = $row['nb'];
+		
+		return $nb;
+		
+	}
+	//Retourne une liste de membres pour une équipe
+	function liste_equipe($id)
+	{
+		global $gCms;
+		$db = cmsms()->GetDb();
+		$query = "DELETE FROM ".cms_db_prefix()."module_compositions_absences WHERE id = ?";
+		$db->Execute($query, array($id));
+	}
+	//récupère les licences des capitaines d'équipes
+	function capitaines()
+	{
+		global $gCms;
+		$db = cmsms()->GetDb();
+		$query = "SELECT DISTINCT capitaine FROM ".cms_db_prefix()."module_compositions_equipes";
+		$dbresult = $db->Execute($query);
+		if($dbresult)
 		{
+			$licences = array();
+			while($row = $dbresult->fetchRow())
+			{
+				$licences[] = $row['capitaine'];
+			}
+			return $licences;
 			
-			return TRUE;
-		}
-		else
-		{
-			//pas de résultats, on renvoit FALSE
-			return FALSE;
 		}
 		
 	}
+	#
+	#
+	#LES EPREUVES
+	//ajoute une nouvelle épreuve
+	function add_epreuve($libelle, $description, $actif)
+	{
+		$db = cmsms()->GetDb();
+		$query = "INSERT INTO ".cms_db_prefix()."module_compositions_epreuves (libelle, description, actif) VALUES ( ?, ?, ?)";
+		$dbresult = $db->Execute($query, array($libelle, $description, $actif));
+		if($dbresult)
+		{
+			return true;
+
+		}
+		else
+		{
+			return false;
+		}
+	}
+	//modifie une épreuve existante
+	function update_epreuve($record_id, $libelle, $description, $actif)
+	{
+		$db = cmsms()->GetDb();
+		$query = "UPDATE ".cms_db_prefix()."module_compositions_epreuves SET libelle = ?, description = ?, actif = ? WHERE id = ? ";//" VALUES (?, ?, ?, ?)";
+		$dbresult = $db->Execute($query, array($libelle, $description, $actif, $record_id));
+		if($dbresult)
+		{
+			return true;
+
+		}
+		else
+		{
+			return false;
+		}
+	}
+	function details_epreuve($record_id)
+	{
+		$db = cmsms()->GetDb();
+		$query = "SELECT id, libelle, description,actif FROM ".cms_db_prefix()."module_compositions_epreuves WHERE id = ?";
+		$dbresult = $db->Execute($query, array($record_id));
+		$details_epreuve = array();
+		while ($dbresult && $row = $dbresult->FetchRow())
+		{
+			$details_epreuve['id'] = $row['id'];
+			$details_epreuve['libelle'] = $row['libelle'];
+			$details_epreuve['description'] = $row['description'];
+			$details_epreuve['actif'] = $row['actif'];					
+		}		
+		return $details_epreuve;
+	}
+	//Cette fonction liste les épreuves par équipes
+	public function liste_epreuves()
+	{
+		$db = cmsms()->GetDb();
+		$query = "SELECT libelle, id FROM  ".cms_db_prefix()."module_compositions_epreuves WHERE actif = '1' ORDER BY libelle ASC";
+		$dbresult = $db->Execute($query);
+		if($dbresult && $dbresult->RecordCount()>0)
+		{
+			while($row = $dbresult->FetchRow())
+			{
+				$epreuve[$row['libelle']] = $row['id'];
+				
+			}
+			return $epreuve;
+		}
+		
+	}
+	//donne le nom d'une compétition
+	function nom_compet($idepreuve)
+	{
+		$db = cmsms()->GetDb();
+		$query = "SELECT libelle FROM ".cms_db_prefix()."module_compositions_epreuves WHERE id = ?";
+		$dbresult = $db->Execute($query, array($idepreuve));
+		if($dbresult && $dbresult->RecordCount()>0)
+		{
+			while($row = $dbresult->FetchRow())
+			{
+				$libelle = $row['libelle'];
+			}
+			return $libelle;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	//les imports des autres modules
+	//ajoute une épreuve depuis le module Ping
+	function add_epreuve_from_ping($idepreuve, $nom)
+	{
+		$db = cmsms()->GetDb();
+		$actif = 1;
+		$query = "INSERT INTO ".cms_db_prefix()."module_compositions_epreuves (id,libelle,actif) VALUES ( ?, ?, ?)";
+		$dbresult = $db->Execute($query, array($idepreuve, $nom,$actif));
+		if($dbresult)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	function add_teams_from_ping($libequipe, $friendlyname,$nb_joueurs, $idepreuve)
+	{
+		$db = cmsms()->GetDb();
+		$query = "INSERT INTO ".cms_db_prefix()."module_compositions_equipes (libequipe, friendlyname,nb_joueurs,idepreuve) VALUES (?, ?, ?, ?)";
+		$dbresult = $db->Execute($query, array($libequipe, $friendlyname,$nb_joueurs, $idepreuve));
+		if($dbresult)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	
 #
 #
 #

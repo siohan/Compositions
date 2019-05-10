@@ -1,8 +1,8 @@
 <?php
 
 #-------------------------------------------------------------------------
-# Module : Cotisations - 
-# Version : 0.1, Sc
+# Module : Compositions - 
+# Version : 0.4, Sc
 # Auteur : Claude SIOHAN
 #-------------------------------------------------------------------------
 /**
@@ -20,7 +20,7 @@ class Compositions extends CMSModule
   
   function GetName() { return 'Compositions'; }   
   function GetFriendlyName() { return $this->Lang('friendlyname'); }   
-  function GetVersion() { return '0.1'; }  
+  function GetVersion() { return '0.4'; }  
   function GetHelp() { return $this->Lang('help'); }   
   function GetAuthor() { return 'Claude SIOHAN'; } 
   function GetAuthorEmail() { return 'claude.siohan@gmail.com'; }
@@ -41,7 +41,7 @@ class Compositions extends CMSModule
   
   function GetDependencies()
   {
-	return array('Adherents'=>'0.2.5','Ping'=>'0.6.4');
+	return array('Adherents'=>'0.3.3.1', 'Messages'=>'0.3.1');
   }
 
   

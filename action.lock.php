@@ -35,7 +35,7 @@ if(isset($params['ref_equipe']) && $params['ref_equipe'] != '')
 if($error <1)
 {
 	$comp_ops = new compositionsbis;
-	$brul_ops = new brulage;
+
 	switch($obj)
 	{
 		case "team":
@@ -49,7 +49,6 @@ if($error <1)
 		case "journee" :
 			
 			$comp_ops->lock($ref_action);
-			$brul_ops->brulage($ref_action);//var_dump($act);
 			$this->SetMessage('Verrous activés');
 			$this->RedirectToAdminTab('compos');
 		break;
