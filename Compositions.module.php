@@ -2,16 +2,15 @@
 
 #-------------------------------------------------------------------------
 # Module : Compositions - 
-# Version : 0.4, Sc
-# Auteur : Claude SIOHAN
+# Version : 0.5, Sc
+# Auteur : AssoSimple
 #-------------------------------------------------------------------------
 /**
  *
- * @author Claude SIOHAN
+ * @author AssoSimple 
  * @since 0.1
  * @version $Revision: 1 $
  * @modifiedby $LastChangedBy: Claude
- * @lastmodified $Date: 2017-03-26 11:56:16 +0200 (Mon, 28 Juil 2015) $
  * @license GPL
  **/
 
@@ -20,10 +19,10 @@ class Compositions extends CMSModule
   
   function GetName() { return 'Compositions'; }   
   function GetFriendlyName() { return $this->Lang('friendlyname'); }   
-  function GetVersion() { return '0.4'; }  
+  function GetVersion() { return '0.5'; }  
   function GetHelp() { return $this->Lang('help'); }   
-  function GetAuthor() { return 'Claude SIOHAN'; } 
-  function GetAuthorEmail() { return 'claude.siohan@gmail.com'; }
+  function GetAuthor() { return 'AssoSimple'; } 
+  function GetAuthorEmail() { return 'contact@asso-simple.fr'; }
   function GetChangeLog() { return $this->Lang('changelog'); }
     
   function IsPluginModule() { return true; }
@@ -41,7 +40,7 @@ class Compositions extends CMSModule
   
   function GetDependencies()
   {
-	return array('Adherents'=>'0.3.3.1', 'Messages'=>'0.3.1');
+	return array('Adherents'=>'0.3.5');
   }
 
   
@@ -56,12 +55,18 @@ class Compositions extends CMSModule
   { 
   	$this->RegisterModulePlugin();
 	$this->RestrictUnknownParams();
+	$this->SetParameterType('genid', CLEAN_INT);
+	$this->SetParameterType('ref_action', CLEAN_STRING);
+	$this->SetParameterType('ref_equipe', CLEAN_INT);
+	$this->SetParameterType('idepreuve', CLEAN_INT);
+	$this->SetParameterType('record_id', CLEAN_STRING);
 
 }
 
 function InitializeAdmin()
 {
-  	$this->SetParameters();
+  	return parent::InitializeAdmin();
+	$this->SetParameters();
 	//$this->CreateParameter('pagelimit', 100000, $this->Lang('help_pagelimit'));
 }
 

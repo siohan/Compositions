@@ -26,10 +26,22 @@ $lang['nom_court'] = 'Donnez un nom court ex(N1, D2)et identifiez rapidement vos
 $lang['nb_joueurs'] = 'Indiquez le nombre de joueurs pour cette équipe';
 
 $lang['help'] = '<h3>Que fait ce module ?</h3>
-<p>Ce module vous aide à réaliser vos compos d\'équipe. Dans un deuxième temps, il envoie les convocations directement par mails aux participants en laissant une trace dans la messagerie interne (Messages).</p>
-<h3>Première utilisation</h3><p>Indiquez les épreuves pour lesquelles vous souhaitez créer des compositions. Ensuite, créez des équipes  en rattachant l\'épreuve souhaitée ainsi que le groupe des joueurs (Groupes depuis le module Adhérents).</p><h3>Fonctionnement des verrous</h3><p> Réalisez vos compos d\'équipe au brouillon. Une fois que vous êtes prêt, passez au propre et offrez-vous la possibilité de verrouiller une ou toutes les compos.
- Sauf permission de déverrouiller, les compos ne seront plus modifiables et vous pourrez alors envoyer des notifications aux joueurs. En verrouillant depuis l\'onglet "Compositions", vous verrouillez toutes les compositions d\'équipes en une seule fois et le les choix sont alors transférés dans la table Brûlage.</p>
-<h3>Duplication</h3><p>Ne perdez plus de temps à refaire les compos, dupliquez-les !</p><ul>
+<p>Ce module vous aide à réaliser vos compos d\'équipes. Dans un deuxième temps, il envoie les convocations directement par mails aux participants en laissant éventuellement une trace dans la messagerie interne (Messages).</p>
+<h3>Première utilisation</h3>
+<p><strong>Important !</strong> Pour fonctionner, vous devez impérativement installer la balise suivante dans une de vos pages <code>{cms_module module=\'Compositions\'}</code></p>
+<p>Copier l\'alias de cette page dans l\'onglet "Configuration". Note : les accents fonctionnent mal.</p>
+<p>Indiquez les épreuves pour lesquelles vous souhaitez créer des compositions. Ensuite, créez des équipes  en rattachant l\'épreuve souhaitée ainsi que le groupe des joueurs (Groupes depuis le module Adhérents).</p>
+<h3>Compositions des équipes par les capitaines</h3>
+<p>Les liens "Mail" et "SMS" depuis la liste des compositions génèrent des emails ou des SMS adressés aux capitaines des équipes concernées avec un lien direct vers un formulaire du site dans lequel ces derniers peuvent alors composer leur équipe. 
+En cliquant sur "Verrouiller", les capitaines valident leurs compos et rendent leurs joueurs indisponibles pour une autre composition. 
+En cliquant enfin sur notifier, ils envoient automatiquement un email au référent indiquant que leur composition est terminée. A ce stade, les capitaines ne peuvent plus modifier leurs équipes.comme quoi</p>
+<h3>Compositions par le référent</h3>
+<p>Le référent peut composer directement les équipes, les verrouiller et envoyer des notifications aux joueurs. Lui seul peut déverrouiller une équipe et rendre les joueurs de celle-ci disponibles pour d\'autres compositions.</p>
+<h3>Fonctionnement des verrous</h3>
+<p>Une fois les compositions d\'équipes réalisées, vous pouvez verrouiller une ou toutes les compos. Verrouiller une compo signifie qu\'elle n\'est plus modifiable que par vous.
+Vous pourrez alors envoyer des notifications aux joueurs. En verrouillant depuis l\'onglet "Compositions", vous verrouillez toutes les compositions d\'équipes en une seule fois.</p>
+<h3>Duplication</h3>
+<p>Ne perdez plus de temps à refaire les compos, dupliquez-les !</p><ul>
 <li>Pour obtenir la dernière version en cours (avant release officielle)
 <a href="https://github.com/siohan/compositions">Version github</a>.</li>
 <li>L\'auteur peut aussi être contacté via skype sous le pseudo agiwebconseil.</li>
@@ -37,7 +49,7 @@ $lang['help'] = '<h3>Que fait ce module ?</h3>
 </ul>
 <p>En tant que licence GPL, ce module est livré tel quel. Merci de lire le texte complet de la license pour une information complête.</p>
 <h3>Copyright et License</h3>
-<p>Copyright &amp;copy; 2014, Claude Siohan <a href="mailto:claude.siohan@gmail.com">claude.siohan@gmail.com</a>. Tous droits réservés.</p>
+<p>Copyright &amp;copy; 2014, AssoSimple <a href="mailto:claude.siohan@gmail.com">AssoSimple</a>. Tous droits réservés.</p>
 <p>Ce module est sous licence <a href="http://www.gnu.org/licenses/licenses.html#GPL">GNU Public License</a>. Vous devez accepter la licence avant d\'utiliser ce module.</p>
 <p>Ce module a été distribué dans l\'espoir d\'être utile, mais sans
 AUCUNE GARANTIE. Il vous appartient de le tester avant toute mise en

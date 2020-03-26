@@ -37,7 +37,8 @@ $flds = "
 	journee I(2),
 	date_created D,
 	actif I(1) DEFAULT 0,
-	statut I(1) DEFAULT 0";
+	statut I(1) DEFAULT 0,
+	date_limite I(11)";
 	$sqlarray = $dict->CreateTableSQL( cms_db_prefix()."module_compositions_journees", $flds, $taboptarray);
 	$dict->ExecuteSQLArray($sqlarray);			
 //
@@ -70,7 +71,8 @@ $flds = "
 	ref_action C(10),
 	ref_equipe C(15),
 	genid I(10),
-	statut I(1) DEFAULT 0 ";
+	statut I(1) DEFAULT 0,
+	timbre I(11) DEFAULT 0 ";
 	$sqlarray = $dict->CreateTableSQL( cms_db_prefix()."module_compositions_compos_equipes", $flds, $taboptarray);
 	$dict->ExecuteSQLArray($sqlarray);			
 //			
@@ -111,6 +113,9 @@ if( file_exists( $fn ) )
 
 $this->SetPreference('admin_email', 'root@localhost.com');
 $this->SetPreference('sujet_relance_email','[A.S] Ton équipe...');
+$this->SetPreference('pageid_compositions','');
+$this->SetPreference('sms_sender','Expéditeur');
+$this->SetPreference('use_messages','0');
 
 
 // put mention into the admin log

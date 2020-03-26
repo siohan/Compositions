@@ -53,9 +53,9 @@ if($error ==0)
 		$i = 0;
 		foreach($genid as $key=>$value)
 		{
-			$query2 = "INSERT INTO ".cms_db_prefix()."module_compositions_compos_equipes (ref_action, ref_equipe, genid) VALUES (?, ?, ?)";
-		//	echo $query2;
-			$dbresultat = $db->Execute($query2, array($ref_action, $ref_equipe,$key));
+			$timbre = time();
+			$query2 = "INSERT INTO ".cms_db_prefix()."module_compositions_compos_equipes (ref_action, ref_equipe, genid, timbre) VALUES (?, ?, ?, ?)";
+			$dbresultat = $db->Execute($query2, array($ref_action, $ref_equipe,$key, $timbre));
 			$i++;
 		}
 		if($i < $nb_joueurs_mini)

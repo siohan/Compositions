@@ -156,7 +156,22 @@ switch($oldversion)
 		
 	}
 	
+	case "0.3" : 
+	case "0.4" :
+	{
+		$this->SetPreference('pageid_compositions','');
+		$flds = "date_limite I(11) DEFAULT 0";
+		$sqlarray = $dict->AddColumnSQL( cms_db_prefix()."module_compositions_journees", $flds);
+		$dict->ExecuteSQLArray($sqlarray);
 		
+		
+		$flds = "timbre I(11) DEFAULT 0";
+		$sqlarray = $dict->AddColumnSQL( cms_db_prefix()."module_compositions_compos_equipes", $flds);
+		$dict->ExecuteSQLArray($sqlarray);
+		
+		$this->SetPreference('sms_sender','Expéditeur');
+		$this->SetPreference('use_messages','0');
+	}
 }
 
 

@@ -7,112 +7,130 @@ if (!$this->CheckPermission('Compositions use'))
 	return;
 }
 global $themeObject;
-//debug_display($params, 'Parameters');
-
 $adh_ops = new Asso_adherents;
 $gp_ops = new groups;
 $comp_ops = new compositionsbis;
-$liste_adherents = $adh_ops->liste_adherents();
-$liste_groupes = $gp_ops->liste_groupes();
-
-if(isset($params['record_id']) && $params['record_id'] !="")
+$eq_ops = new equipes_comp;
+if(!empty($_POST))
 {
+	if( isset($_POST['cancel']))
+	{
+		$this->RedirectToAdminTab();
+	}
+	
+	//debug_display($_POST, 'Parameters');
+	if (isset($_POST['edit']) && $_POST['edit'] != '')
+	{
+		$edit = $_POST['edit'];
+	}
+	if (isset($_POST['record_id']) && $_POST['record_id'] != '')
+	{
+		$record_id = $_POST['record_id'];
+	}
+	if (isset($_POST['libequipe']) && $_POST['libequipe'] != '')
+	{
+		$libequipe = $_POST['libequipe'];
+	}
+	if (isset($_POST['friendlyname']) && $_POST['friendlyname'] != '')
+	{
+		$friendlyname = $_POST['friendlyname'];
+	}
+	if (isset($_POST['capitaine']) && $_POST['capitaine'] != '')
+	{
+		$capitaine = $_POST['capitaine'];
+	}
+	if (isset($_POST['nb_joueurs']) && $_POST['nb_joueurs'] != '')
+	{
+		$nb_joueurs = $_POST['nb_joueurs'];
+	}
+	if (isset($_POST['idepreuve']) && $_POST['idepreuve'] != '')
+	{
+		$idepreuve = $_POST['idepreuve'];
+	}
+	if (isset($_POST['liste_id']) && $_POST['liste_id'] != '')
+	{
+		$liste_id = $_POST['liste_id'];
+	}
+
+	
+	
+		if($edit ==0)
+		{
+			//on ajoute une nouvelle équipe
+			
+			$add_team = $eq_ops->add_team($libequipe, $friendlyname, $idepreuve, $capitaine, $nb_joueurs, $liste_id);
+			if(true == $add_team)
+			{
+				$this->SetMessage('Equipe ajoutée avec succès');
+			}
+			else
+			{
+				$this->SetMessage('Equipe non ajoutée, une erreur est apparue');
+			}
+		}//on vire toutes les données de cette compo avant 
+		else
+		{
+			$update = $eq_ops->update_team($libequipe, $friendlyname, $idepreuve, $capitaine, $nb_joueurs, $liste_id, $record_id);
+			if(true == $update)
+			{
+				$this->SetMessage('Equipe modifiée avec succès');
+			}
+			else
+			{
+				$this->SetMessage('Equipe non modifiée, une erreur est apparue');
+			}
+		}
+		$this->RedirectToAdminTab('equipes');
+		
+}
+else
+{
+	//debug_display($params, 'Parameters');
+	// valeurs par défaut
+	$record_id = '';
+	$libequipe = '';
+	$friendlyname = '';
+	$nb_joueurs = 0;
+	$capitaine = 0;
+	$idepreuve = 0;
+	$liste_id = 1;
+	$edit = 0;
+	
+	$liste_adherents = $adh_ops->liste_adherents();
+	$liste_groupes = $gp_ops->liste_groupes_dropdown();
+	$liste_epreuves = $comp_ops->liste_epreuves();
+
+	if(isset($params['record_id']) && $params['record_id'] !="")
+	{
 		$record_id = $params['record_id'];
 		$edit = 1;
-		$query = "SELECT libequipe,friendlyname,idepreuve, nb_joueurs,capitaine, nb_joueurs, liste_id FROM ".cms_db_prefix()."module_compositions_equipes WHERE id = ?";
-		$dbresult = $db->Execute($query, array($record_id));
-		$compt = 0;
-		while ($dbresult && $row = $dbresult->FetchRow())
-		{
-			$compt++;
-			$libequipe = $row['libequipe'];
-			$friendlyname = $row['friendlyname'];
-			$nb_joueurs = $row['nb_joueurs'];
-			$capitaine = $row['capitaine'];
-			$idepreuve = $row['idepreuve'];
-			$liste_id = $row['liste_id'];
-		}
-		$smarty->assign('record_id',$this->CreateInputHidden($id,'record_id',$record_id));
-}
-	
-	$liste_epreuves = $comp_ops->liste_epreuves();
-	
+		$details = $eq_ops->details_equipe($record_id);
+		$libequipe = $details['libequipe'];
+		$friendlyname = $details['friendlyname'];
+		$nb_joueurs = $details['nb_joueurs'];
+		$capitaine = $details['capitaine'];
+		$idepreuve = $details['idepreuve'];
+		$liste_id = $details['liste_id'];
+	}
 
-	$smarty->assign('idepreuve',
-			$this->CreateInputDropdown($id, 'idepreuve',$liste_epreuves));
-	
+	$tpl = $smarty->CreateTemplate($this->GetTemplateResource('add_edit_equipe.tpl'), null, null, $smarty);
+	$tpl->assign('record_id',$record_id);
+	$tpl->assign('edit',$edit);
+	$tpl->assign('liste_adherents',$liste_adherents);
+	$tpl->assign('idepreuve',$idepreuve);
+	$tpl->assign('liste_epreuves',$liste_epreuves);
+	$tpl->assign('liste_groupes',$liste_groupes);
+	$tpl->assign('libequipe',$libequipe);
+	$tpl->assign('friendlyname',$friendlyname);
+	$tpl->assign('idepreuve',$idepreuve);
+	$tpl->assign('capitaine',$capitaine);
+	$tpl->assign('liste_id',$liste_id);
+	$tpl->assign('nb_joueurs',$nb_joueurs);
+	$tpl->display();
 
-if(isset($capitaine))	
-{
-	$key_capitaine = array_values($liste_adherents);//$index_paiement = $paiement;
-	//var_dump($key_statut_commande);
-	$key2_capitaine = array_search($capitaine,$key_capitaine);
-	//var_dump($key2_statut_commande);
-}
-else
-{
-	$key2_capitaine = 0;
-	$capitaine = 0;
-}
-if(isset($liste_id))	
-{
-	$key_liste_id = array_values($liste_groupes);//$index_paiement = $paiement;
-	//var_dump($key_statut_commande);
-	$key2_liste_id = array_search($liste_id,$key_liste_id);
-	//var_dump($key2_statut_commande);
-}
-else
-{
-	$key2_liste_id = 0;
-	$liste_id = 1;
-}
-if(isset($idepreuve))	
-{
-	$key_idepreuve = array_values($liste_epreuves);//$index_paiement = $paiement;
-	//var_dump($key_statut_commande);
-	$key2_idepreuve = array_search($idepreuve,$key_idepreuve);
-	//var_dump($key2_statut_commande);
-}
-else
-{
-	$key2_idepreuve = 0;
-	$idepreuve = 0;
-}
-
-
-	$OuiNon = array("Non"=>"0", "Oui"=>"1");//on construit le formulaire
-	$smarty->assign('formstart',
-			    $this->CreateFormStart( $id, 'do_add_edit_equipe', $returnid ) );
-
-	
-			
-
-	
-	$smarty->assign('libequipe',
-			$this->CreateInputText($id,'libequipe',(isset($libequipe)?$libequipe:""), 30, 150));
-	$smarty->assign('friendlyname',
-			$this->CreateInputText($id,'friendlyname',(isset($friendlyname)?$friendlyname:""), 30, 150));
-	$smarty->assign('idepreuve',
-			$this->CreateInputDropdown($id,'idepreuve',$liste_epreuves,$selectedIndex=$key2_idepreuve,$selectedvalue=$idepreuve));
-	$smarty->assign('capitaine',
-			$this->CreateInputDropdown($id,'capitaine',$liste_adherents,$selectedIndex=$key2_capitaine,$selectedvalue=$capitaine));
-	$smarty->assign('liste_id',
-					$this->CreateInputDropdown($id,'liste_id',$liste_groupes,$selectedIndex=$key2_liste_id,$selectedvalue=$liste_id));
-	$smarty->assign('nb_joueurs',
-			$this->CreateInputText($id,'nb_joueurs',(isset($nb_joueurs)?$nb_joueurs:""), 30, 150));
 		
-	$smarty->assign('submit',
-			$this->CreateInputSubmit($id, 'submit', $this->Lang('submit'), 'class="button"'));
-	$smarty->assign('submitasnew',
-			$this->CreateInputSubmit($id, 'submitasnew', $this->Lang('submitasnew'), 'class="button"'));
-	$smarty->assign('cancel',
-			$this->CreateInputSubmit($id,'cancel',
-						$this->Lang('cancel')));
+}
 
-
-	$smarty->assign('formend',
-			$this->CreateFormEnd());
-echo $this->ProcessTemplate('add_edit_equipe.tpl');
 
 #
 # EOF

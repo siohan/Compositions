@@ -7,14 +7,14 @@ if (!$this->CheckPermission('Compositions use'))
 	return;
 }
 global $themeObject;
-
+$timbre = time();
 $lock = '<img src="../modules/Compositions/images/lock.png" class="systemicon" alt="Déverrouiller" title="Déverrouiller">';
 $unlock = '<img src="../modules/Compositions/images/unlock.png" class="systemicon" alt="Verrouiller" title="Verrouiller">';
 $smarty->assign('add_edit_compo',
 		$this->CreateLink($id, 'add_edit_compo', $returnid,$contents='Ajouter une journée'));
 
 $result= array ();
-$query = "SELECT id, idepreuve, journee, ref_action, actif, statut FROM ".cms_db_prefix()."module_compositions_journees ";
+$query = "SELECT id, idepreuve, journee, ref_action, actif, statut, date_limite FROM ".cms_db_prefix()."module_compositions_journees ";
 $query.=" ORDER BY idepreuve ASC, journee ASC";
 $dbresult= $db->Execute($query);
 	
@@ -33,6 +33,7 @@ $dbresult= $db->Execute($query);
       			{
 				$actif = $row['actif'];
 				$statut = $row['statut'];
+				$date_limite = $row['date_limite'];
 				$onerow= new StdClass();
 				$onerow->rowclass= $rowclass;
 				$onerow->id= $row['id'];
@@ -57,7 +58,8 @@ $dbresult= $db->Execute($query);
 				$onerow->journee= $row['journee'];
 				if($actif == 1)
 				{
-					$onerow->actif = $themeObject->DisplayImage('icons/system/true.gif', $this->Lang('true'),'','','systemicon');
+					$onerow->actif = $this->CreateLink($id, 'actif', $returnid, $themeObject->DisplayImage('icons/system/true.gif', $this->Lang('true'),'','','systemicon'), array("ref_action"=>$row['ref_action'],"actif"=>"0"));//,$warn_message='Vous pourrez verrouiller toutes les compos pour cette journée');
+					//$onerow->actif = $this->CreateLink($id, 'actif', $returnid, $themeObject->DisplayImage('icons/system/true.gif', $this->Lang('true'),'','','systemicon'), array("activate"=>"0","ref_action"=>$row['ref_action']));
 					if($statut == 0)
 					{
 						$onerow->statut = $this->CreateLink($id, 'lock', $returnid, $unlock, array("lock"=>"1","ref_action"=>$row['ref_action']));//$themeObject->DisplayImage('icons/system/true.gif', $this->Lang('delete'), '', '', 'systemicon');
@@ -69,11 +71,24 @@ $dbresult= $db->Execute($query);
 						$onerow->statut = $this->CreateLink($id, 'unlock', $returnid, $lock, array("lock"=>"0","ref_action"=>$row['ref_action']));
 
 					}
+					if($date_limite > $timbre)
+					{
+						$onerow->emailing = $this->CreateLink($id, 'emailing', $returnid, $contents='Mail',array('ref_action'=>$row['ref_action'], 'idepreuve'=>$row['idepreuve']));
+						$onerow->sms = $this->CreateLink($id, 'relance_sms', $returnid, $contents='SMS',array('ref_action'=>$row['ref_action'], 'idepreuve'=>$row['idepreuve']));
+					}
+					else
+					{
+						$onerow->emailing = $themeObject->DisplayImage('icons/system/false.gif', $this->Lang('false'),'','','systemicon');
+						$onerow->sms = $themeObject->DisplayImage('icons/system/false.gif', $this->Lang('false'),'','','systemicon');
+					}
+					
 				}
 				else
 				{
-					$onerow->actif = $this->CreateLink($id, 'actif', $returnid, $themeObject->DisplayImage('icons/system/false.gif', $this->Lang('false'),'','','systemicon'), array("ref_action"=>$row['ref_action'],"actif"=>"1"),$warn_message='Vous pourrez verrouiller toutes les compos pour cette journée');
+					$onerow->actif = $this->CreateLink($id, 'actif', $returnid, $themeObject->DisplayImage('icons/system/false.gif', $this->Lang('false'),'','','systemicon'), array("ref_action"=>$row['ref_action'],"actif"=>"1"));//,$warn_message='Vous pourrez verrouiller toutes les compos pour cette journée');
 					$onerow->statut = $themeObject->DisplayImage('icons/system/stop.gif', $this->Lang('stop'),'','','systemicon');
+					$onerow->emailing = $themeObject->DisplayImage('icons/system/false.gif', $this->Lang('false'),'','','systemicon');
+					$onerow->sms = $themeObject->DisplayImage('icons/system/false.gif', $this->Lang('false'),'','','systemicon');
 				}
 			//	$onerow->manage = $this->CreateLink($id, 'creer_liste', $returnid, $themeObject->DisplayImage('icons/system/groupassign.gif', $this->Lang('groupassign'),'','','systemicon'),array("idepreuve"=>$row['idepreuve']));
 				$onerow->view = $this->CreateLink($id, 'view_compos', $returnid, $themeObject->DisplayImage('icons/system/view.gif', $this->Lang('view'), '', '', 'systemicon'),array("ref_action"=>$row['ref_action'],"idepreuve"=>$row['idepreuve']) );

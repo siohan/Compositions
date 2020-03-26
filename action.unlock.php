@@ -35,7 +35,7 @@ if(isset($params['ref_equipe']) && $params['ref_equipe'] != '')
 if($error <1)
 {
 	$comp_ops = new compositionsbis;
-	$brul_ops = new brulage;
+//	$brul_ops = new brulage;
 	switch($obj)
 	{
 		case "team":

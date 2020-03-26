@@ -1,5 +1,5 @@
 <div class="pageoptions"><p class="pageoptions">{$itemcount}&nbsp;{$itemsfound}</p></div>
-<p>{$add_edit_compo} </p>
+<p><a href="{cms_action_url action='add_edit_compo'}">{admin_icon icon='newobject.gif'} Ajouter une composition</a> </p>
 {if $itemcount > 0}
 
 <table cellpadding="0" class="pagetable cms_sortable tablesorter" id="articlelist">
@@ -12,9 +12,9 @@
 		<th>Nb Equipes</th>
 		<th>Nb joueurs mini</th>
 		<th>Fait</th>
-		<th>Brouillon/Propre ?</th>
+		<th>Actif ?</th>
 		<th>Verrou</th>
-		<th colspan="3">Action(s)</th>
+		<th colspan="6">Action(s)</th>
 	</tr>
  </thead>
  <tbody>
@@ -29,7 +29,10 @@
 	<td>{$entry->pourcentage_remplissage}%</td>
 	<td>{$entry->actif}</td>
 	<td>{$entry->statut}</td>
+	<td>{$entry->emailing}</td>
+	<td>{$entry->sms}</td>
 	<td>{$entry->view}</td>
+	<td>{$entry->edit}</td>
 	<td>{$entry->duplicate}</td>
 	<td>{$entry->delete}</td>
   </tr>

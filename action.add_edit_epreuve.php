@@ -7,59 +7,97 @@ if (!$this->CheckPermission('Compositions use'))
 	return;
 }
 global $themeObject;
-//debug_display($params, 'Parameters');
-//$ping = cms_utils::get_module('Ping');
 $comp_ops = new compositionsbis;
-$liste_epreuves = $comp_ops->liste_epreuves();
-//var_dump($liste_epreuves_equipes);
-for($i=0; $i<=50;$i++)
+if(!empty($_POST))
 {
-//	echo $i;
-	$liste_journees[$i] = $i;
-}
-//var_dump($liste_journees); 
-$liste_phase = array("1"=>"1","2"=>"2");
-$OuiNon = array("Inactif"=>"0", "Actif"=>"1");
-$edit = 0; //variable pour savoir s'il s'agit d'un ajout ou d'une modification
-if(isset($params['record_id']) && $params['record_id'] !="")
-{
-		$record_id = $params['record_id'];
-		$edit = 1;
-		$details = $comp_ops->details_epreuve($record_id);
-		$actif = $details['actif'];
-		$smarty->assign('record_id',$this->CreateInputHidden($id,'record_id',$record_id));	
-}
+	//debug_display($_POST, 'Parameters');
+	$this->SetCurrentTab('epreuves');
+	if(isset($_POST['edition']) && $_POST['edition'] != '')
+	{
+		$edit = $_POST['edition'];
+	}
+	else
+	{
+		$edit = 0;//il s'agit d'un ajout de commande
+	}
 
-if(!isset($actif))	
-{
-	$actif = 1;
+	if(isset($_POST['record_id']) && $_POST['record_id'] != '')
+	{
+		$record_id = $_POST['record_id'];
+	}
+
+	if(isset($_POST['libelle']))
+	{
+		$libelle = $_POST['libelle'];
+	}
+	if(isset($_POST['description']))
+	{
+		$description = $_POST['description'];
+	}
+	$actif = '1';
+	if(isset($_POST['actif']) && $_POST['actif'] != '')
+	{
+		$actif = $_POST['actif'];
+	}
+
+	if($edit == 0)
+	{
+		//on fait d'abord l'insertion 
+		$add_epreuve = $comp_ops->add_epreuve($libelle, $description, $actif);
+		$this->SetMessage('Epreuve ajoutée !');
+	}
+	elseif($edit == 1)
+	{
+		//il s'agit d'une mise à jour !
+		$update_epreuve = $comp_ops->update_epreuve($record_id, $libelle, $description, $actif);
+		$this->SetMessage('Epreuve modifiée !');
+	}			
+		
+		$this->RedirectToAdminTab();
+	
 }
+else
+{
+	//debug_display($params, 'Parameters');
+	//valeur par défaut
+	$liste_epreuves = $comp_ops->liste_epreuves();
+	$actif = 1;
+	$libelle = '';
+	$description ='';
+	$record_id = '';
+	for($i=0; $i<=50;$i++)
+	{
+	//	echo $i;
+		$liste_journees[$i] = $i;
+	}
+	
+	$OuiNon = array("Inactif"=>"0", "Actif"=>"1");
+	$edit = 0; //variable pour savoir s'il s'agit d'un ajout ou d'une modification
+	if(isset($params['record_id']) && $params['record_id'] !="")
+	{
+			$record_id = $params['record_id'];
+			$edit = 1;
+			$details = $comp_ops->details_epreuve($record_id);
+			$libelle = $details['libelle'];
+			$description = $details['description'];
+			$actif = $details['actif'];			
+	}
 
 	//on construit le formulaire
-	$smarty->assign('formstart',
-			    $this->CreateFormStart( $id, 'do_add_epreuve', $returnid ) );
-
-	
-			
-
-	$smarty->assign('edition',
-			$this->CreateInputHidden($id,'edition',$edit));
-	$smarty->assign('libelle',
-			$this->CreateInputText($id,'libelle',(isset($details['libelle'])?$details['libelle']:""), 50, 150));
-	$smarty->assign('description',
-			$this->CreateInputText($id, 'description',(isset($details['description'])?$details['description']:""), 50, 150));
-	$smarty->assign('actif',
-			$this->CreateInputDropdown($id,'actif',$OuiNon, $selectedvalue=$actif));						
-	$smarty->assign('submit',
-			$this->CreateInputSubmit($id, 'submit', $this->Lang('submit'), 'class="button"'));
-	$smarty->assign('cancel',
-			$this->CreateInputSubmit($id,'cancel',
-						$this->Lang('cancel')));
+	$tpl = $smarty->CreateTemplate($this->GetTemplateResource('add_edit_epreuve.tpl'), null, null, $smarty);
+	$tpl->assign('record_id',$record_id);	
+	$tpl->assign('edition',$edit);
+	$tpl->assign('libelle',$libelle);
+	$tpl->assign('description',$description);
+	$tpl->assign('actif',$actif);
+	$tpl->assign('liste_epreuves', $liste_epreuves);
+	$tpl->display();					
+		
 
 
-	$smarty->assign('formend',
-			$this->CreateFormEnd());
-echo $this->ProcessTemplate('add_edit_epreuve.tpl');
+		
+}
+
 
 #
 # EOF

@@ -2,26 +2,16 @@
 
 if( !isset($gCms) ) exit;
 
-if (!$this->CheckPermission('Compositions use'))
-{
-    	echo $this->ShowErrors($this->Lang('needpermission'));
-	return;
-   
-}
 
-if( isset($params['cancel']) )
-{
-    	$this->RedirectToAdminTab('compos');
-    	return;
-}
-global $themeObject;
 //debug_display($params, 'Parameters');
 $db = cmsms()->GetDb();
 $error = 0;
 $comp_ops = new compositionsbis;
+$mess = '';
+$eq_ops = new equipes_comp;
 
 //il faut les parametres suivants : idepreuve, saison, ref_action, et peut-être ref_action
-$smarty->assign('retour', $this->CreateLink($id, 'defaultadmin', $returnid, '<= Retour'));
+
 if(isset($params['ref_action']) && $params['ref_action'] != '')
 {
 	$ref_action = $params['ref_action'];
@@ -40,26 +30,11 @@ else
 }
 $epreuve = $comp_ops->nom_compet($idepreuve);
 $smarty->assign('epreuve', $epreuve);
-if(isset($params['ref_equipe']) && $params['ref_equipe'] != '')
+$ref_equipe1 = 1;
+if(isset($params['ref_equipe']) && $params['ref_equipe'] !='')
 {
 	$ref_equipe1 = $params['ref_equipe'];
-	$ref_equipe = $params['ref_equipe'];
 }
-else
-{
-	//pas d'équipe !
-	//on en choisit une !
-	$query = "SELECT id FROM ".cms_db_prefix()."module_compositions_equipes WHERE idepreuve = ?  ORDER BY id ASC LIMIT 1";
-	$dbresult = $db->Execute($query, array($idepreuve));
-	if($dbresult && $dbresult->RecordCount() >0)
-	{
-		$row = $dbresult->FetchRow();
-		$ref_equipe1 = $row['id'];
-		$ref_equipe = $row['id'];
-	}
-	
-}
-
 if($error >0)
 {
 	$this->SetMessage('Paramètres manquants');
@@ -67,9 +42,7 @@ if($error >0)
 }
 else
 {
-	$nb_player = $comp_ops->player_by_idepreuve($idepreuve);//le nb de joueurs nécessaires aux compos
-	$nb_already_used = $comp_ops->nb_already_used_licences($ref_action);
-	$mess = 'Vous avez utilisé '.$nb_already_used.' joueurs(euses) sur '.$nb_player.' nécessaires !';
+	
 	$smarty->assign('message', $mess);
 	//on récupère d'abord les équipes concernées
 	$query = "SELECT id, libequipe, friendlyname FROM ".cms_db_prefix()."module_compositions_equipes WHERE idepreuve = ? ORDER BY id ASC";
@@ -79,11 +52,13 @@ else
 	$rowclass = 'row1';
 	if($dbresult && $dbresult->RecordCount()>0)
 	{
-			$eq_ops = new equipes_comp;
 			while($row = $dbresult->FetchRow())
 			{
 				$onerow = new StdClass;
 				$onerow->rowclass=$rowclass;
+				$ref_equipe = $row['id'];
+				$nb_players = $eq_ops->nb_players_in_team($ref_action, $ref_equipe);
+				$onerow->nb_players = $nb_players;
 				$libequipe = $row['libequipe'];
 				$friendlyname = $row['friendlyname'];
 				$ref_eq = $row['id'];
@@ -97,9 +72,7 @@ else
 				}
 				$onerow->class= $classe;
 				$lienequipe = (!empty($row['friendlyname'])?$row['friendlyname']: $row['libequipe']);
-				$nb_players = $eq_ops->nb_players_in_team($ref_action, $ref_eq);
-				$onerow->nb_players = $nb_players;
-				$onerow->equipe = $this->CreateLink($id, 'view_compos', $returnid, $lienequipe, array("ref_action"=>$ref_action, "ref_equipe"=>$row['id']));
+				$onerow->equipe = $this->CreateLink($id, 'recap_compos', $returnid, $lienequipe, array("ref_action"=>$ref_action, "ref_equipe"=>$row['id']));
 				($rowclass == "row1" ? $rowclass= "row2" : $rowclass= "row1");
 				$rowarray[]= $onerow;
 			}
@@ -129,14 +102,12 @@ else
 				if($statut == "0")
 				{
 					$smarty->assign('lock', $this->CreateLink($id, 'lock', $returnid, 'Verrouiller', array("ref_action"=>$ref_action, "ref_equipe"=>$ref_equipe, "lock"=>"1")));
-					$relance = '<img src="../modules/Paiements/images/forward-email-16.png" class="systemicon" alt="Envoyer une relance" title="Envoyer une relance">';
-					$smarty->assign('delete', $this->CreateLink($id, 'delete', $returnid, 'Supprimer la compo', array("obj"=>"equipe","ref_action"=>$ref_action, "ref_equipe"=>$ref_equipe)));
-					$smarty->assign('modifier', $this->CreateLink($id, 'add_edit_compos_equipe', $returnid, 'Modifier', array("ref_action"=>$ref_action, "ref_equipe"=>$ref_equipe,"edit"=>"1")));
+					
 				}
 				else
 				{
 					$smarty->assign('lock', $this->CreateLink($id, 'unlock', $returnid,'Déverrouiller', array("ref_action"=>$ref_action, "ref_equipe"=>$ref_equipe, "lock"=>"0")));
-					$smarty->assign('emailing', $this->CreateLink($id, 'envoi_notification_joueurs', $returnid, 'Envoi notifications', array("ref_action"=>$ref_action,"ref_equipe"=>$ref_equipe1)));
+					
 				}
 				$onerow2 = new StdClass;
 				$onerow2->ref_action = $row2['ref_action'];
@@ -151,17 +122,14 @@ else
 			$smarty->assign('items2', $rowarray2);
 
 		}
-		/*
 		else
 		{
-			$this->Redirect($id, 'add_edit_compos_equipe', $returnid, array('ref_action'=>$ref_action, 'ref_equipe'=>$ref_equipe));
+		//	$this->Redirect($id, 'add_edit_compos_equipe', $returnid, array('ref_action'=>$ref_action, 'ref_equipe'=>$ref_equipe));
 		}
-		*/
 	} 
 //	$lock = '<img src="../modules/Compositions/images/lock.png" class="systemicon" alt="Déverrouiller" title="Déverrouiller">';
 //	$unlock = '<img src="../modules/Compositions/images/unlock.png" class="systemicon" alt="Verrouiller" title="Verrouiller">';
 	
-	$smarty->assign('ajouter', $this->CreateLink($id, 'add_edit_compos_equipe', $returnid, 'Ajouter une composition', array("ref_action"=>$ref_action, "ref_equipe"=>$ref_equipe)));
 	
-	echo $this->ProcessTemplate('view_equipes.tpl');
+	echo $this->ProcessTemplate('fe_compos_equipes.tpl');
 }

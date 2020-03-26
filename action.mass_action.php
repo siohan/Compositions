@@ -6,7 +6,7 @@ if (!$this->CheckPermission('Compositions use'))
 	echo $this->ShowErrors($this->Lang('needpermission'));
 	return;
 }
-$comp_ops = new compositions();
+$comp_ops = new compositionsbis;
 debug_display($params, 'Parameters');
 var_dump($params['sel']);
 $db =& $this->GetDb();
@@ -39,13 +39,17 @@ if (isset($params['submit_massaction']) && isset($params['actiondemasse']) )
 				
 			
 			break;
-			/*
-			case "sexe" :
-				$id_sel = implode("-",$params['sel']);
-				$this->Redirect($id,'change_paiement',$returnid, array("sel"=>$id_sel));
+			//supprime plusieurs équipes
+			case "delete_team" :
+				
+				foreach( $params['sel'] as $record_id)
+				{
+					$comp_ops->delete_eq( $record_id);
+				}
+				$this->RedirectToAdminTab('equipes');
 			
 			break;
-			
+			/*
 			case "item_categorie" :
 				$id_sel = implode("-",$params['sel']);
 				$this->Redirect($id,'change_item_categorie',$returnid, array("sel"=>$id_sel));

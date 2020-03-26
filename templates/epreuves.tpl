@@ -1,5 +1,5 @@
 <div class="pageoptions"><p class="pageoptions">{$itemcount}&nbsp;{$itemsfound}&nbsp;</p></div>
-<p>{$add_edit_epreuve} </p>
+<p><a href="{cms_action_url action='add_edit_epreuve'}">{admin_icon icon="newobject.gif"} Ajouter une épreuve</a></p>
 {if $itemcount > 0}
 
 <table cellpadding="0" class="pagetable cms_sortable tablesorter" id="articlelist">

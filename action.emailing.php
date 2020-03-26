@@ -7,227 +7,157 @@ if(!$this->CheckPermission('Compositions use'))
 	echo $this->ShowErrors($this->Lang('needpermission'));
 	return;
 }
+
+$comp_ops = new compositionsbis;
 $db = cmsms()->GetDb();
 global $themeObject;
-debug_display($params, 'Parameters');
+//debug_display($params, 'Parameters');
 $aujourdhui = date('Y-m-d');
 $error = 0;
+
+$admin_email = $this->GetPreference('admin_email');
+$subject = $this->GetPreference('sujet_relance_email');
+//var_dump($admin_email);
 if(isset($params['ref_action']) && $params['ref_action'] != "")
 {
 	$ref_action = $params['ref_action'];
+	$details = $comp_ops->details_ref_action($ref_action);
+	$journee = $details['journee'];
+	$epreuve = $details['idepreuve'];
 }
 else
 {
 	$error++;
 }
-if(isset($params['ref_equipe']) && $params['ref_equipe'] != "")
+if(isset($params['idepreuve']) && $params['idepreuve'] != "")
 {
-	$ref_equipe = $params['ref_equipe'];
+	$idepreuve = $params['idepreuve'];
 }
 else
 {
 	$error++;
 }
-$mess_inst = cms_utils::get_module('Messages');
-if(is_object($mess_inst)) $result = 1;
-if($error == 0 && true == $result)
+
+//on insère individuellement
+//$mess_inst = cms_utils::get_module('Messages');
+//if(is_object($mess_inst)) $result = 1;
+if($error == 0)// && true == $result)
 {
-	$comp_ops = new compositionsbis;
-	//$ping_ops = new ping_admin_ops;
-	//tt va bien on a les parametres requis
-	//on va d'abord chercher les genid
-	$genids = $comp_ops->licences_by_ref_equipe($ref_action, $ref_equipe);
-	//var_dump($licences);
-	$adresses = array();
-	//on va chercher les emails pour les licences
 	
-	//on récupére d'autres infos
-	$query = "SELECT journee, idepreuve FROM  ".cms_db_prefix()."module_compositions_journees WHERE ref_action = ?";
-	$dbresult = $db->Execute($query, array($ref_action));
+	if(true == $this->GetPreference('use_messages'))
+	{
+		$mess_ops = new T2t_messages;
+
+		$senddate = date('Y-m-d');
+		$sendtime = date('H:i:s');
+		$replyto = $admin_email;
+		$group_id = 0;
+		$recipients_number = 0;
+		$sent = 1;
+		$priority = 3;
+		$timbre = time();
+		$ar = 0;
+		$relance = 0;
+		$occurence = 0;
+		$add = $mess_ops->add_message($admin_email, $senddate, $sendtime, $replyto, $group_id,$recipients_number, $subject, $subject, $sent, $priority, $timbre, $ar, $relance, $occurence);
+		if(true == $add)
+		{
+			$last_id = $db->Insert_ID();
+		}
+	}
+	
+	$cg_ops = new CGExtensions;
+	$cont_ops = new contact;
+	$eq_ops = new equipes_comp;
+	$retourid = $this->GetPreference('pageid_compositions');
+	$page = $cg_ops->resolve_alias_or_id($retourid);
+
+	$query = "SELECT  idepreuve, capitaine, friendlyname, id FROM  ".cms_db_prefix()."module_compositions_equipes WHERE idepreuve = ?";
+	$dbresult = $db->Execute($query, array($idepreuve));
 	if($dbresult && $dbresult->RecordCount()>0)
 	{
 		while($row = $dbresult->FetchRow())
 		{
-			$journee = $row['journee'];
-			$epreuve = $comp_ops->nom_compet($row['idepreuve']);
-		}
-	}
-	$smarty->assign('journee', $journee);
-	$smarty->assign('epreuve', $epreuve);
-	
-	$results = $comp_ops->get_equipe($ref_equipe);
-	//var_dump($results);
-	
-	$smarty->assign('friendlyname', $results['friendlyname']);
-	$smarty->assign('libequipe', $results['libequipe']);
-	
-	//var_dump($adresses);
-	// on commence le traitement
-
-	$from = $this->GetPreference('admin_email');
-	$sujet = $this->GetPreference('sujet_relance_email');		
-	$message = $this->GetTemplate('relance_email');
-	$body = $this->ProcessTemplateFromData($message);
-	$priority = 3;
-
-	$senddate = date('Y-m-d');
-	$sendtime = date("H:i:s");
-	$replyto = $from;
-	$sent = 1;
-	//$gp_ops = new groups;
-	//$recipients_number = $gp_ops->count_users_in_group($group_id);
-	$recipients_number = 4;
-	$group_id = 0;
-	
-	
-	$mess_ops = new T2t_messages;
-	$message_envoi = $mess_ops->add_message($from, $senddate, $sendtime, $replyto, $group_id,$recipients_number, $sujet, $body, $sent);
-	$message_id =$db->Insert_ID();
-	//var_dump($message_id);
-  	if(FALSE !== $genids)
-	{
-		$adh = cms_utils::get_module('Adherents');
-		$adh_ops = new contact;
-
-		foreach($genids as $tab)
-		{
-			$emails = $adh_ops->email_address($tab);
-			//on vérifie que les licences renvoient bien une adresse email !
-			if(FALSE !== $emails)
+			
+			$capitaine = $row['capitaine'];
+			$epreuve = $row['idepreuve'];
+			$friendlyname = $row['friendlyname'];
+			$equipe_id = $row['id'];
+			
+			//on vérifie si une compo est déjà complète
+			//$complete = $eq_ops->is_complete($ref_action, $equipe_id);
+			//var_dump($complete);
+			$locked = $eq_ops->is_locked($ref_action, $equipe_id);
+			 if(false == $locked)
 			{
-				$sent = 0;
-			//	$emails = 'mail absent';
-				$cmsmailer = new \cms_mailer();
-				$cmsmailer->reset();
-				//$cmsmailer->SetFrom($from);//$this->GetPreference('admin_email'));
-				$cmsmailer->AddAddress($emails,$name='');
-				$cmsmailer->IsHTML(true);
-				$cmsmailer->SetPriority($priority);
-				$cmsmailer->SetBody($body);
-				$cmsmailer->SetSubject($sujet);
-				$cmsmailer->Send();
+				//on vérifie que le capitaine a bien une adresse email 
+				$adresse_email = $cont_ops->email_address($capitaine);
+				if(!false == $adresse_email)
+				{
+					$lien = $this->create_url($id,'default',$page, array("ref_action"=>$ref_action, "genid"=>$capitaine));
+					//$subject = 'Compose ton équipe';
+					$priority = 3;
+					$montpl = $this->GetTemplateResource('email_compos_equipes.tpl');						
+					$smarty = cmsms()->GetSmarty();
+					// do not assign data to the global smarty
+					$tpl = $smarty->createTemplate($montpl);
+					$tpl->assign('lien',$lien);
+					$tpl->assign('epreuve',$epreuve);
+					$tpl->assign('journee', $journee);
+					$tpl->assign('friendlyname', $friendlyname);
+				 	$output = $tpl->fetch();
 				
-				if( !$cmsmailer->Send() ) 
-				{
-			            	audit('',$this->GetName(),'Problem sending email to '.$item);
-					$sent = 0;
-					$ar = 0;
+					$i = 0; //Pour inclure un seul message originel
+					if(true == $this->GetPreference('use_messages'))
+					{
+						$sent = 1;
+						$status = 'Ok';
+						$ar = 0;
+						$send_to_recipients = $mess_ops->add_messages_to_recipients($last_id, $capitaine, $adresse_email,$output,$sent,$status, $ar);
+						
+					}
+					$cmsmailer = new \cms_mailer();
 
-			        }
-				else
-				{
-					$sent = 1;
-					$ar = 0;
+					//$cmsmailer->SetSMTPDebug($flag = TRUE);
+					$cmsmailer->SetFrom($admin_email);
+					$cmsmailer->AddReplyTo( $admin_email, $name = '' );
+					$cmsmailer->AddAddress($adresse_email, $name='');
+				//	$cmsmailer->AddBCC('claude.siohan@gmail.com', $name='Claude SIOHAN');
+					$cmsmailer->IsHTML(true);
+					$cmsmailer->SetPriority($priority);
+					$cmsmailer->SetBody($output);
+					$cmsmailer->SetSubject($subject);
+
+
+			                if( !$cmsmailer->Send() ) 
+					{			
+			                    	//return false;
+						if(true == $this->GetPreference('use_messages'))
+						{
+							$mess_ops->not_sent_emails($message_id, $capitaine);
+						}
+			                }
+
 
 				}
+				else
+				{
+					//on indique l'erreur : pas d'email disponible !
+					$senttouser = 0;
+					$status = "Email absent";
+					$ar = 0;
+					$email_contact = "rien";
+				}
 			}
-			else
-			{
-				
-			}
-			$ar = 0;
-			$add_to_recipients = $mess_ops->add_messages_to_recipients($message_id, $tab, $emails,$sent,$status, $ar);
-		}
-
-	}
-	//var_dump($adresses);
-	
-	
-}
-/*
-else
-{
-	
-}
-
-
-
-
-//on extrait les utilisateurs (genid) du groupe sélectionné
-$contacts_ops = new contact;
-//$adherents = $contacts_ops->UsersFromGroup($group_id);
-	
-	
-
-if(is_array($adresses))
-{
-	if(count($adresses) >1)
-
-	{
-		//$destinataires  = implode(',',$adresses);
-		foreach($adresses as $item=>$v)
-		{
-
-		//var_dump($item);
-
-			$cmsmailer = new \cms_mailer();
-			$cmsmailer->reset();
-			//$cmsmailer->SetFrom($from);//$this->GetPreference('admin_email'));
-			$cmsmailer->AddAddress($v,$name='');
-			$cmsmailer->IsHTML(true);
-			$cmsmailer->SetPriority($priority);
-			$cmsmailer->SetBody($body);
-			$cmsmailer->SetSubject($sujet);
-			$cmsmailer->Send();
-		
-		
-		
-		        if( !$cmsmailer->Send() ) 
-			{
-		            	audit('',$this->GetName(),'Problem sending email to '.$item);
-				$sent = 0;
-				$ar = 0;
-
-		        }
-			else
-			{
-				$sent = 1;
-				$ar = 0;
 			
-			}
-			if(true == $result)
-			{
-				$add_to_recipients = $mess_ops->add_messages_to_recipients($message_id, $sels, $v,$sent,$status, $ar);
-			}	
-		}
+			
+			
+		}	
 	}
-	elseif(count($adresses) == 1)
-	{
-		$destinataires = $adresses[0];
-		$cmsmailer = new \cms_mailer();
-		$cmsmailer->reset();
-	//	$cmsmailer->SetFrom($from);//$this->GetPreference('admin_email'));
-		$cmsmailer->AddAddress($destinataires,$name='');
-		$cmsmailer->IsHTML(true);
-		$cmsmailer->SetPriority($priority);
-		$cmsmailer->SetBody($body);
-		$cmsmailer->SetSubject($sujet);
-		$cmsmailer->Send();
-
-	        if( !$cmsmailer->Send() ) 
-		{
-	            	$sent = 0;
-			$ar = 0;
-			audit('',$this->GetName(),'Problem sending email to '.$item);
-		}
-		else
-		{
-			$sent = 1;
-			$ar = 0;
-
-		}
-		if(true == $result)
-		{
-			$add_to_recipients = $mess_ops->add_messages_to_recipients($message_id, $sels, $destinataires,$sent,$status, $ar);
-		}
-	}
-	else
-	{
-		//pas d'emails envoyés aucune adresse valide !!
-	}
-	$this->SetMessage('email(s) envoyé(s)');
+	
+	
 }
-*/
+
 
 $this->Redirect($id, 'defaultadmin', $returnid);
 

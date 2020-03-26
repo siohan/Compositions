@@ -8,16 +8,12 @@
 //	debug_display($params, 'Parameters');
 
 echo $this->StartTabheaders();
-if (FALSE == empty($params['__activetab']) )
-  {
-    $tab = $params['__activetab'];
-  } else {
-  $tab = 'compositions';
- }	
-	echo $this->SetTabHeader('epreuves', 'Epreuves', ('epreuves' == $tab)?true:false);
-	echo $this->SetTabHeader('equipes', 'Equipes', ('equipes' == $tab)?true:false);
-	echo $this->SetTabHeader('compositions', 'Compositions', ('compos' == $tab)?true:false);	
-	echo $this->SetTabHeader('email', 'Emails' , ('email' == $tab)?true:false);
+$active_tab = empty($params['active_tab']) ? '' : $params['active_tab'];
+
+	echo $this->SetTabHeader('compos', 'Compositions', ($active_tab == 'compos')?true:false);
+	echo $this->SetTabHeader('epreuves', 'Epreuves', ($active_tab == 'epreuves')?true:false);
+	echo $this->SetTabHeader('equipes', 'Equipes', ($active_tab == 'equipes')?true:false);		
+	echo $this->SetTabHeader('config', 'Config' , ($active_tab == 'config')?true:false);
 
 
 
@@ -27,22 +23,23 @@ echo $this->StartTabContent();
 	
 	
 	
+	echo $this->StartTab('compos', $params);
+    	include(dirname(__FILE__).'/action.admin_compositions_tab.php');
+   	echo $this->EndTab();
+
 	echo $this->StartTab('epreuves', $params);
     	include(dirname(__FILE__).'/action.admin_epreuves_tab.php');
    	echo $this->EndTab();
 
 	echo $this->StartTab('equipes', $params);
     	include(dirname(__FILE__).'/action.admin_equipes_tab.php');
-   	echo $this->EndTab();
-
-	echo $this->StartTab('compositions', $params);
-    	include(dirname(__FILE__).'/action.admin_compositions_tab.php');
-   	echo $this->EndTab();
+   	echo $this->EndTab();	
 
 	/**/
-	echo $this->StartTab('email', $params);
+	echo $this->StartTab('config', $params);
     	include(dirname(__FILE__).'/action.admin_emails_tab.php');
    	echo $this->EndTab();
+
 
 
 

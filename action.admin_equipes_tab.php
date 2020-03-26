@@ -37,6 +37,7 @@ $dbresult= $db->Execute($query);
 				$onerow= new StdClass();				
 				$onerow->rowclass= $rowclass;				
 				$idepreuve = $row['idepreuve'];
+				$onerow->id_equipe = $row['id'];
 				$onerow->libequipe =  $row['libequipe'];
 				$onerow->friendlyname= $row['friendlyname'];
 				$onerow->idepreuve = $comp_ops->nom_compet($row['idepreuve']);
@@ -58,7 +59,17 @@ $dbresult= $db->Execute($query);
 	
 		$smarty->assign('itemsfound', $this->Lang('resultsfoundtext'));
 		$smarty->assign('itemcount', count($rowarray));
-		$smarty->assign('items', $rowarray);	
+		$smarty->assign('items', $rowarray);
+		
+		$smarty->assign('form2start',
+				$this->CreateFormStart($id,'mass_action',$returnid));
+		$smarty->assign('form2end',
+				$this->CreateFormEnd());
+		$articles = array("Supprimer"=>"delete_team");
+		$smarty->assign('actiondemasse',
+				$this->CreateInputDropdown($id,'actiondemasse',$articles));
+		$smarty->assign('submit_massaction',
+				$this->CreateInputSubmit($id,'submit_massaction',$this->Lang('apply_to_selection'),'','',$this->Lang('areyousure_actionmultiple')));	
 
 echo $this->ProcessTemplate('equipes.tpl');
 
