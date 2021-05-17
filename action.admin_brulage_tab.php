@@ -14,7 +14,7 @@ $liste_epreuves_equipes = $ping->liste_epreuves_equipes();
 
 
 //$ping = new Ping;
-$saison_courante = $ping->GetPreference('saison_en_cours');
+$saison_courante = '2018-2019';//$ping->GetPreference('saison_en_cours');
 $phase_courante = $ping->GetPreference('phase_en_cours');
 $saison_en_cours = (isset($params['saison_en_cours']))?$params['saison_en_cours']:$saison_courante;
 $phase_en_cours = (isset($params['phase_en_cours']))?$params['phase_en_cours']:$phase_courante;
@@ -108,7 +108,7 @@ $dbresult= $db->Execute($query,$parms);
 		//on prépare le second form d'action de masse
 	
 
-echo $this->ProcessTemplate('brulage.tpl');
+echo $this->ProcessTemplate('admin_brulage.tpl');
 
 
 #

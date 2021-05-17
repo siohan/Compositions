@@ -28,7 +28,7 @@ $lang['nb_joueurs'] = 'Indiquez le nombre de joueurs pour cette équipe';
 $lang['help'] = '<h3>Que fait ce module ?</h3>
 <p>Ce module vous aide à réaliser vos compos d\'équipes. Dans un deuxième temps, il envoie les convocations directement par mails aux participants en laissant éventuellement une trace dans la messagerie interne (Messages).</p>
 <h3>Première utilisation</h3>
-<p><strong>Important !</strong> Pour fonctionner, vous devez impérativement installer la balise suivante dans une de vos pages <code>{cms_module module=\'Compositions\'}</code></p>
+<p><strong>Important !</strong> Pour fonctionner, vous devez impérativement installer la balise suivante dans une de vos pages <code>{cms_module module=\'Inscriptions\'}</code></p>
 <p>Copier l\'alias de cette page dans l\'onglet "Configuration". Note : les accents fonctionnent mal.</p>
 <p>Indiquez les épreuves pour lesquelles vous souhaitez créer des compositions. Ensuite, créez des équipes  en rattachant l\'épreuve souhaitée ainsi que le groupe des joueurs (Groupes depuis le module Adhérents).</p>
 <h3>Compositions des équipes par les capitaines</h3>

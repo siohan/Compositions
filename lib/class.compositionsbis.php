@@ -223,7 +223,31 @@ class Compositionsbis
 		}
 		
 	}
-
+	/*
+	function restrictions_clt_mini($ref_equipe)
+	{
+		global $gCms;
+		$db = cmsms()->GetDb();
+		$query = "SELECT clt_mini, points_maxi FROM ".cms_db_prefix()."module_compositions_equipes WHERE ref_equipe = ?";
+		$dbresult = $db->Execute($query, array($ref_equipe));
+		if($dbresult && $dbresult->RecordCount()>0)
+		{
+			$row = $dbresult->FetchRow();
+			$clt_mini = $row['clt_mini'];
+			$points_maxi = $row['points_maxi'];
+			if($clt_mini >0)
+			{
+				return $clt_mini;
+			}
+			else
+			{
+				return FALSE;
+			}
+			
+		}
+		
+	}
+	*/
 	function get_idepreuve($ref_action)
 	{
 		global $gCms;

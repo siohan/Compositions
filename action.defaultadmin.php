@@ -12,7 +12,8 @@ $active_tab = empty($params['active_tab']) ? '' : $params['active_tab'];
 
 	echo $this->SetTabHeader('compos', 'Compositions', ($active_tab == 'compos')?true:false);
 	echo $this->SetTabHeader('epreuves', 'Epreuves', ($active_tab == 'epreuves')?true:false);
-	echo $this->SetTabHeader('equipes', 'Equipes', ($active_tab == 'equipes')?true:false);		
+	echo $this->SetTabHeader('equipes', 'Equipes', ($active_tab == 'equipes')?true:false);	
+	echo $this->SetTabHeader('brulage', 'Brulage', ($active_tab == 'brulage')?true:false);		
 	echo $this->SetTabHeader('config', 'Config' , ($active_tab == 'config')?true:false);
 
 
@@ -35,6 +36,9 @@ echo $this->StartTabContent();
     	include(dirname(__FILE__).'/action.admin_equipes_tab.php');
    	echo $this->EndTab();	
 
+	echo $this->StartTab('brulage', $params);
+    	include(dirname(__FILE__).'/action.admin_brulage_tab.php');
+   	echo $this->EndTab();
 	/**/
 	echo $this->StartTab('config', $params);
     	include(dirname(__FILE__).'/action.admin_emails_tab.php');

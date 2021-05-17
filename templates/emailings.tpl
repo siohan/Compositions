@@ -12,7 +12,7 @@
 </div>
 </fieldset>
 <fieldset>
-<legend>Réglages des emails et SMS</legend>
+<legend>Réglages des emails SMS</legend>
 <div class="pageoverflow">
 	<p class="pagetext">Expéditeur des SMS</p>
 	<input type="text" name="sms_sender" value="{$sms_sender}" size="40">

@@ -151,12 +151,10 @@ else
 			$smarty->assign('items2', $rowarray2);
 
 		}
-		/*
 		else
 		{
-			$this->Redirect($id, 'add_edit_compos_equipe', $returnid, array('ref_action'=>$ref_action, 'ref_equipe'=>$ref_equipe));
+			//$this->Redirect($id, 'add_edit_compos_equipe', $returnid, array('ref_action'=>$ref_action, 'ref_equipe'=>$ref_equipe));
 		}
-		*/
 	} 
 //	$lock = '<img src="../modules/Compositions/images/lock.png" class="systemicon" alt="Déverrouiller" title="Déverrouiller">';
 //	$unlock = '<img src="../modules/Compositions/images/unlock.png" class="systemicon" alt="Verrouiller" title="Verrouiller">';

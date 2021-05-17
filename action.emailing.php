@@ -72,7 +72,7 @@ if($error == 0)// && true == $result)
 	$retourid = $this->GetPreference('pageid_compositions');
 	$page = $cg_ops->resolve_alias_or_id($retourid);
 
-	$query = "SELECT  idepreuve, capitaine, friendlyname, id FROM  ".cms_db_prefix()."module_compositions_equipes WHERE idepreuve = ?";
+	$query = "SELECT  idepreuve, capitaine, friendlyname, id FROM  ".cms_db_prefix()."module_compositions_equipes WHERE idepreuve = ? AND actif = 1";
 	$dbresult = $db->Execute($query, array($idepreuve));
 	if($dbresult && $dbresult->RecordCount()>0)
 	{
@@ -122,7 +122,7 @@ if($error == 0)// && true == $result)
 					$cmsmailer->SetFrom($admin_email);
 					$cmsmailer->AddReplyTo( $admin_email, $name = '' );
 					$cmsmailer->AddAddress($adresse_email, $name='');
-				//	$cmsmailer->AddBCC('claude.siohan@gmail.com', $name='Claude SIOHAN');
+					$cmsmailer->AddBCC('claude.siohan@gmail.com', $name='Claude SIOHAN');
 					$cmsmailer->IsHTML(true);
 					$cmsmailer->SetPriority($priority);
 					$cmsmailer->SetBody($output);

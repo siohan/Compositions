@@ -52,6 +52,7 @@ if(!empty($_POST))
 	{
 		$statut = $_POST['statut'];
 	}
+	$saison = '2020-2021';
 	//traitement de la date
 	$date_limite = mktime($_POST['limite_Hour'], $_POST['limite_Minute'], $_POST['limite_Second'],$_POST['limite_Month'], $_POST['limite_Day'], $_POST['limite_Year']);
 	if($error < 1)
@@ -65,7 +66,7 @@ if(!empty($_POST))
 		else
 		{
 			// c'est un insert
-			$comp_ops->add_journee($ref_action, $idepreuve, $journee, $date_created, $actif, $statut, $date_limite);
+			$comp_ops->add_journee($ref_action, $idepreuve, $journee, $date_created, $actif, $statut, $date_limite, $saison);
 		}
 		//on redirige
 		$this->RedirectToAdminTab();

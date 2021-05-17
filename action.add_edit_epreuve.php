@@ -10,7 +10,7 @@ global $themeObject;
 $comp_ops = new compositionsbis;
 if(!empty($_POST))
 {
-	//debug_display($_POST, 'Parameters');
+	debug_display($_POST, 'Parameters');
 	$this->SetCurrentTab('epreuves');
 	if(isset($_POST['edition']) && $_POST['edition'] != '')
 	{
@@ -58,7 +58,7 @@ if(!empty($_POST))
 }
 else
 {
-	//debug_display($params, 'Parameters');
+	debug_display($params, 'Parameters');
 	//valeur par défaut
 	$liste_epreuves = $comp_ops->liste_epreuves();
 	$actif = 1;

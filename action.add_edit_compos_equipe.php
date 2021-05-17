@@ -15,7 +15,7 @@ if( isset($params['cancel']) )
 }
 
 //debug_display($params, 'Parameters');
-$db =& $this->GetDb();
+$db = cmsms()->GetDb();
 $comp_ops = new compositionsbis;
 $adh_ops = new Asso_adherents;
 $error = 0;

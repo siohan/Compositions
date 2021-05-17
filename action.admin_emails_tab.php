@@ -6,7 +6,7 @@ if (!$this->CheckPermission('Compositions use'))
 	echo $this->ShowErrors($this->Lang('needpermission'));
 	return;
 }
-//debug_display($_POST, 'Parameters');
+//debug_display($params, 'Parameters');
 if(!empty($_POST))
 {
 	$message = '';
@@ -15,25 +15,17 @@ if(!empty($_POST))
 	$this->SetPreference('admin_email', $_POST['admin_email']);
 	$this->SetPreference('sujet_relance_email', $_POST['sujet_relance_email']);
 	$this->SetPreference('pageid_compositions', $_POST['pageid_compositions']);
-	if($_POST['use_messages']  == 1)
+	$module = \cms_utils::get_module('Messages');
+	if( is_object( $module ) )
 	{
-		$module = \cms_utils::get_module('Messages');
-		if( is_object( $module ) )
-		{
-			$this->SetPreference('use_messages', $_POST['use_messages']);
-
-		}
-		else
-		{
-			$this->SetPreference('use_messages', '0');
-			$message.=" Module Messages absent ou non activé !";
-		}
+		$this->SetPreference('use_messages', $_POST['use_messages']);
+		
 	}
 	else
 	{
 		$this->SetPreference('use_messages', '0');
+		$message.=" Module Messages absent ou non activé !";
 	}
-	
 	$message.=" Configuration modifiée";
 	$this->SetMessage($message);
 	$this->RedirectToAdminTab('config');
